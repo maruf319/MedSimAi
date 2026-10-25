@@ -29,19 +29,20 @@ const CATEGORIES = [
     { id: 'communication', key: 'communication', title: 'Communication', subtitle: 'Rapport, empathy and clear language' },
 ];
 
-function Message({ role, children }) {
+function Message({ role, name, children }) {
     const you = role === 'student'
     return (
         <div className={`flex ${you ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] rounded-[20px] px-4 py-3 text-[14.5px] leading-6 sm:max-w-[75%] ${you ? 'rounded-br-md bg-grad text-on-hero' : 'rounded-bl-md bg-surface-2'}`}>
-                <div className='pb-0.5 text-[11.5px] font-semibold opacity-70'>{you ? 'You' : 'Patient'}</div>
+                <div className='pb-0.5 text-[11.5px] font-semibold opacity-70'>{you ? 'You' : name}</div>
                 {children}
             </div>
         </div>
     )
 }
 
-export default function Feedback({ feedback, messages = [], notes = "", caseTitle, caseSlug, plan = "", planReview = null, confidenceRows = [] }) {
+export default function Feedback({ feedback, messages = [], notes = "", caseTitle, caseSlug, patientName = null, plan = "", planReview = null, confidenceRows = [] }) {
+    const patientLabel = patientName?.trim().split(/\s+/)[0] || 'Patient';
     const [activeTab, setActiveTab] = useState('AI Feedback');
     const [openSections, setOpenSections] = useState({});
     const toggleSection = (id) => setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -104,7 +105,7 @@ export default function Feedback({ feedback, messages = [], notes = "", caseTitl
                         {messages.length === 0
                             ? <p className='text-ink-2'>No messages were exchanged in this session.</p>
                             : <div className='flex flex-col gap-3.5'>
-                                {messages.map((msg, idx) => <Message key={idx} role={msg.role}>{msg.content}</Message>)}
+                                {messages.map((msg, idx) => <Message key={idx} role={msg.role} name={patientLabel}>{msg.content}</Message>)}
                             </div>}
                     </section>
                     <section className='card tint p-5 sm:p-[26px]'>

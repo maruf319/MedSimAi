@@ -36,7 +36,7 @@ export default async function page({ params }) {
     const caseAttempt = await CaseAttempt.findOne({ _id: attemptId, user: user._id }).lean();
     if (!caseAttempt) notFound();
 
-    const clinicalCase = await Case.findById(caseAttempt.case).select('title slug').lean();
+    const clinicalCase = await Case.findById(caseAttempt.case).select('title slug aiScenario.patient.name').lean();
 
     const stored = caseAttempt.feedback;
     if (stored?.overallScore == null) {
@@ -82,6 +82,7 @@ export default async function page({ params }) {
             notes={caseAttempt.notes ?? ""}
             caseTitle={clinicalCase?.title}
             caseSlug={clinicalCase?.slug}
+            patientName={clinicalCase?.aiScenario?.patient?.name ?? null}
             plan={plan}
             planReview={planReview}
             confidenceRows={confidenceRows}

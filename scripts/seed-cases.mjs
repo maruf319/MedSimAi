@@ -13,6 +13,7 @@ const cases = [
     {
         title: "Shortness of Breath",
         slug: "shortness-of-breath",
+        pdfUrl: "/cases/docs/shortness-of-breath.pdf",
         description: "A 45-year-old man presents with three days of worsening shortness of breath, a productive cough and fever.",
         difficulty: "Beginner",
         image: "/cases/lungs.png",
@@ -62,6 +63,7 @@ const cases = [
     {
         title: "Sudden Severe Headache",
         slug: "sudden-severe-headache",
+        pdfUrl: "/cases/docs/sudden-severe-headache.pdf",
         description: "A 32-year-old woman presents with a sudden, severe headache that started three hours ago while exercising.",
         difficulty: "Intermediate",
         image: "/cases/headache.webp",
@@ -111,6 +113,7 @@ const cases = [
     {
         title: "Right Lower Abdominal Pain",
         slug: "right-lower-abdominal-pain",
+        pdfUrl: "/cases/docs/right-lower-abdominal-pain.pdf",
         description: "A 22-year-old man presents with abdominal pain that started around his belly button and has moved to the right lower abdomen.",
         difficulty: "Beginner",
         image: "/cases/person.png",
@@ -160,6 +163,7 @@ const cases = [
     {
         title: "Increased Thirst and Tiredness",
         slug: "increased-thirst-and-tiredness",
+        pdfUrl: "/cases/docs/increased-thirst-and-tiredness.pdf",
         description: "A 52-year-old woman visits her GP with three months of increased thirst, passing urine more often and tiredness.",
         difficulty: "Beginner",
         image: "/cases/person.png",
@@ -209,6 +213,7 @@ const cases = [
     {
         title: "Tiredness and Weight Gain",
         slug: "tiredness-and-weight-gain",
+        pdfUrl: "/cases/docs/tiredness-and-weight-gain.pdf",
         description: "A 41-year-old woman presents with six months of tiredness, weight gain and feeling cold all the time.",
         difficulty: "Intermediate",
         image: "/cases/person.png",
@@ -258,6 +263,7 @@ const cases = [
     {
         title: "Palpitations",
         slug: "palpitations",
+        pdfUrl: "/cases/docs/palpitations.pdf",
         description: "A 68-year-old man presents with two days of an irregular, fluttering heartbeat and mild breathlessness.",
         difficulty: "Advanced",
         image: "/cases/chest.png",
@@ -316,7 +322,8 @@ for (const c of cases) {
         { $setOnInsert: { ...c, completedBy: 0, isPublished: true, createdAt: now, updatedAt: now, __v: 0 } },
         { upsert: true }
     );
-    console.log(`${result.upsertedCount ? "added  " : "exists "} ${c.slug}`);
+    const doc = await collection.updateOne({ slug: c.slug, pdfUrl: { $in: [null, ""] } }, { $set: { pdfUrl: c.pdfUrl } });
+    console.log(`${result.upsertedCount ? "added  " : "exists "} ${c.slug}${doc.modifiedCount ? " (case document linked)" : ""}`);
 }
 
 await mongoose.disconnect();

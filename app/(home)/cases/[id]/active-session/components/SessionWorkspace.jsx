@@ -5,29 +5,32 @@ import { X } from 'lucide-react'
 import Header from './Header'
 import ChatBox from './ChatBox'
 import Note from './Note'
+import { patientInitials, patientName, patientSummary } from '../../components/patient'
 
-export default function SessionWorkspace({ slug, title, attemptId, startedAt, initialMessages, initialNotes, plan = '' }) {
+export default function SessionWorkspace({ slug, title, attemptId, startedAt, initialMessages, initialNotes, plan = '', patient = null, caseDocument = null }) {
     const [notesOpen, setNotesOpen] = useState(false)
     const [panelTab, setPanelTab] = useState('notes')
 
     return (
         <div className="flex h-full min-h-0 w-full flex-col gap-3 px-3 pb-[96px] pt-3 sm:px-4 lg:p-6">
-            <Header slug={slug} title={title} attemptId={attemptId} startedAt={startedAt} onToggleNotes={() => setNotesOpen((v) => !v)} />
+            <Header slug={slug} title={title} attemptId={attemptId} startedAt={startedAt} caseDocument={caseDocument} onToggleNotes={() => setNotesOpen((v) => !v)} />
 
             <div className="mx-auto flex min-h-0 w-full max-w-[1240px] flex-1 gap-4">
                 <section aria-label="Consultation" className="card flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
                     <div className="flex shrink-0 items-center gap-3 border-b border-line px-5 py-4">
-                        <span className='orb' style={{ '--orb': '38px' }} aria-hidden />
-                        <div className='flex flex-col'>
-                            <h2 className="text-[17px] font-bold">Simulated patient</h2>
-                            <span className="flex items-center gap-2 text-xs text-ink-3">
-                                <span className="h-2 w-2 rounded-full bg-good" />
-                                Patient is ready
+                        <span className='relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-accent-soft font-display text-[15px] font-bold text-accent-ink' aria-hidden>
+                            {patientInitials(patient)}
+                            <span className='absolute bottom-0 right-0 h-3 w-3 rounded-full bg-good ring-2 ring-surface' />
+                        </span>
+                        <div className='flex min-w-0 flex-col'>
+                            <h2 className="truncate text-[17px] font-bold">{patientName(patient)}</h2>
+                            <span className="truncate text-xs text-ink-3">
+                                {patientSummary(patient) ? `${patientSummary(patient)} · ` : ''}Your patient
                             </span>
                         </div>
                     </div>
 
-                    <ChatBox attemptId={attemptId} initialMessages={initialMessages} />
+                    <ChatBox attemptId={attemptId} initialMessages={initialMessages} patient={patient} />
                 </section>
 
                 {notesOpen && <div className="fixed inset-0 z-40 bg-scrim lg:hidden" onClick={() => setNotesOpen(false)} />}

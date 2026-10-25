@@ -1,5 +1,5 @@
 'use client'
-import { ArrowLeft, NotebookPen, StopCircle } from 'lucide-react'
+import { ArrowLeft, FileText, NotebookPen, StopCircle } from 'lucide-react'
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
@@ -13,7 +13,7 @@ function formatElapsed(totalSeconds) {
     return hours > 0 ? `${hours}:${pad(minutes)}:${pad(seconds)}` : `${pad(minutes)}:${pad(seconds)}`;
 }
 
-export default function Header({ slug, title, attemptId, startedAt, onToggleNotes }) {
+export default function Header({ slug, title, attemptId, startedAt, caseDocument, onToggleNotes }) {
     const [now, setNow] = useState(() => Date.now());
     const [isStopping, setIsStopping] = useState(false);
     const [error, setError] = useState('');
@@ -83,6 +83,10 @@ export default function Header({ slug, title, attemptId, startedAt, onToggleNote
                         {/* Server and browser clocks differ by a moment; the next tick corrects it */}
                         <span suppressHydrationWarning>{formatElapsed(elapsed)}</span>
                     </div>
+                    {caseDocument &&
+                        <a href={caseDocument} target='_blank' rel='noopener noreferrer' className={btn('ghost', 'sm')}>
+                            <FileText aria-hidden /> <span className='hidden sm:inline'>Case brief</span>
+                        </a>}
                     <button
                         type='button'
                         onClick={onToggleNotes}

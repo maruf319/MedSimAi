@@ -17,7 +17,10 @@ export default async function Page({ params, searchParams }) {
 
     await dbconnect()
 
-    const clinicalCase = await Case.findOne({ slug }).select('_id title').lean();
+    // Only the details already printed on the case brief (name, age, sex, occupation)
+    const clinicalCase = await Case.findOne({ slug })
+        .select('_id title pdfUrl aiScenario.patient.name aiScenario.patient.age aiScenario.patient.gender aiScenario.patient.occupation')
+        .lean();
     if (!clinicalCase) notFound();
 
     let caseAttempt = null;
@@ -43,6 +46,13 @@ export default async function Page({ params, searchParams }) {
         <SessionWorkspace
             slug={slug}
             title={clinicalCase.title}
+            caseDocument={clinicalCase.pdfUrl || null}
+            patient={{
+                name: clinicalCase.aiScenario?.patient?.name ?? null,
+                age: clinicalCase.aiScenario?.patient?.age ?? null,
+                gender: clinicalCase.aiScenario?.patient?.gender ?? null,
+                occupation: clinicalCase.aiScenario?.patient?.occupation ?? null,
+            }}
             attemptId={caseAttempt._id.toString()}
             initialMessages={caseAttempt.messages.map(({ role, content }) => ({ role, content }))}
             initialNotes={caseAttempt.notes ?? ''}
