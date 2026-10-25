@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { ArrowRight, Play } from 'lucide-react'
-import SpecialtyIcon from '@/app/components/SpecialtyIcon'
+import { btn, Chip, Meter } from '@/app/components/ui'
 
 function formatDate(value) {
     if (!value) return ''
@@ -10,38 +10,24 @@ function formatDate(value) {
     })
 }
 
-function StatusBadge({ status }) {
-    const styles = {
-        completed: 'bg-green-100 text-green-700',
-        started: 'bg-amber-100 text-amber-700',
-        abandoned: 'bg-gray-100 text-gray-600',
-    }
-    const labels = { completed: 'Completed', started: 'In progress', abandoned: 'Abandoned' }
-    return (
-        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[status] ?? styles.abandoned}`}>
-            {labels[status] ?? status}
-        </span>
-    )
+const STATUS = {
+    completed: { tone: 'good', label: 'Completed' },
+    started: { tone: 'warn', label: 'In progress' },
+    abandoned: { tone: 'neutral', label: 'Abandoned' },
 }
 
 function AttemptAction({ attempt }) {
     if (attempt.status === 'completed') {
         return (
-            <Link
-                href={`/cases/${attempt.slug}/feedback/${attempt.attemptId}`}
-                className='inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-brand-secondary px-4 py-2 text-sm font-medium text-light-blue hover:border-light-blue hover:bg-brand-primary'
-            >
-                View feedback <ArrowRight className='h-4 w-4' />
+            <Link href={`/cases/${attempt.slug}/feedback/${attempt.attemptId}`} className={btn('ghost', 'sm')}>
+                View feedback <ArrowRight aria-hidden />
             </Link>
         )
     }
     if (attempt.status === 'started') {
         return (
-            <Link
-                href={`/cases/${attempt.slug}/active-session?attempt=${attempt.attemptId}`}
-                className='inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-light-blue px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark'
-            >
-                <Play className='h-4 w-4' /> Resume
+            <Link href={`/cases/${attempt.slug}/active-session?attempt=${attempt.attemptId}`} className={btn('primary', 'sm')}>
+                <Play aria-hidden /> Resume
             </Link>
         )
     }
@@ -50,37 +36,48 @@ function AttemptAction({ attempt }) {
 
 export default function AttemptList({ attempts, showCase = true, emptyText = "You haven't attempted any cases yet." }) {
     if (attempts.length === 0) {
-        return <div className='rounded-2xl border border-dashed border-gray-300 bg-white p-8 text-center text-Secondary-Text'>{emptyText}</div>
+        return <div className='card p-8 text-center text-ink-2'>{emptyText}</div>
     }
 
     return (
-        <ul className='divide-y divide-brand-secondary overflow-hidden rounded-2xl border border-brand-secondary bg-white'>
-            {attempts.map((attempt) =>
-                <li key={attempt.attemptId} className='flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4 sm:px-6'>
-                    <div className='flex min-w-0 flex-1 items-center gap-4'>
-                        {showCase &&
-                            <SpecialtyIcon specialty={attempt.specialty} className='h-11 w-11 shrink-0 rounded-xl bg-brand-primary p-2.5 text-light-blue' />}
-                        <div className='min-w-0'>
-                            <div className='truncate font-semibold'>
+        <ul className='flex flex-col gap-2.5'>
+            {attempts.map((attempt) => {
+                const status = STATUS[attempt.status] ?? STATUS.abandoned
+                return (
+                    <li key={attempt.attemptId} className='card grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-5 gap-y-3 px-5 py-[18px] sm:px-6 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_72px_auto]'>
+                        <div className='flex min-w-0 flex-col gap-1'>
+                            <span className='truncate font-display text-[17px] font-bold tracking-[-0.02em]'>
                                 {showCase ? attempt.title : `Attempt ${attempt.attemptNumber}`}
-                            </div>
-                            <div className='text-sm text-Secondary-Text'>
+                            </span>
+                            <span className='text-[13px] text-ink-3'>
                                 {showCase && <>Attempt {attempt.attemptNumber} · </>}
                                 {formatDate(attempt.completedAt ?? attempt.startedAt)}
                                 {' · '}{attempt.questionsAsked} {attempt.questionsAsked === 1 ? 'question' : 'questions'}
-                            </div>
+                            </span>
                         </div>
-                    </div>
 
-                    <div className='flex items-center justify-between gap-4 sm:justify-end'>
-                        <div className='flex items-center gap-3'>
-                            <StatusBadge status={attempt.status} />
-                            {attempt.score !== null &&
-                                <span className='rounded-full bg-brand-primary px-3 py-1 text-sm font-semibold text-light-blue'>{attempt.score}%</span>}
+                        <div className='hidden items-center gap-3 md:flex'>
+                            {attempt.score !== null
+                                ? <Meter value={attempt.score} size='sm' n={28} className='flex-1' />
+                                : <Chip tone={status.tone} dot>{status.label}</Chip>}
                         </div>
-                        <AttemptAction attempt={attempt} />
-                    </div>
-                </li>)}
+
+                        <span className='hidden text-right md:block'>
+                            {attempt.score !== null &&
+                                <span className='num text-[26px] tracking-[-0.03em]'>{attempt.score}<small className='ml-0.5 text-[0.36em] font-semibold opacity-60'>%</small></span>}
+                        </span>
+
+                        <div className='flex items-center justify-end gap-3'>
+                            <span className='md:hidden'>
+                                {attempt.score !== null
+                                    ? <span className='num text-[22px] tracking-[-0.03em]'>{attempt.score}%</span>
+                                    : <Chip tone={status.tone} dot>{status.label}</Chip>}
+                            </span>
+                            <AttemptAction attempt={attempt} />
+                        </div>
+                    </li>
+                )
+            })}
         </ul>
     )
 }

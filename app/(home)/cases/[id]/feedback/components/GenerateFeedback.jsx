@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Sparkles } from 'lucide-react'
+import { Button } from '@/app/components/ui'
 
 export default function GenerateFeedback({ attemptId }) {
     const router = useRouter()
@@ -24,23 +25,19 @@ export default function GenerateFeedback({ attemptId }) {
     }
 
     return (
-        <div className='flex flex-col items-start gap-3 rounded-2xl border border-brand-secondary bg-white p-6'>
-            <div>
-                <h2 className='font-semibold'>Your feedback isn&apos;t ready yet</h2>
-                <p className='mt-1 text-sm text-Secondary-Text'>
+        <section className='hero flex flex-col items-start gap-4 p-6 sm:p-9'>
+            <span className='orb' style={{ '--orb': '64px' }} aria-hidden />
+            <div className='flex flex-col gap-2'>
+                <h2 className='text-[26px] font-bold text-on-hero'>Your feedback isn&apos;t ready yet</h2>
+                <p className='max-w-[52ch] text-on-hero-2'>
                     The AI evaluator reviews your whole consultation. This usually takes 10 to 30 seconds.
                 </p>
             </div>
-            <button
-                type='button'
-                onClick={generate}
-                disabled={isGenerating}
-                className='inline-flex items-center gap-2 rounded-full bg-light-blue px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-500 cursor-pointer disabled:cursor-wait disabled:opacity-60'
-            >
-                <Sparkles className='h-4 w-4' />
+            <Button variant='white' onClick={generate} disabled={isGenerating}>
+                <Sparkles aria-hidden />
                 {isGenerating ? 'Generating feedback...' : 'Generate feedback'}
-            </button>
-            {error && <p className='text-sm text-red-600'>{error}</p>}
-        </div>
+            </Button>
+            {error && <p className='rounded-[14px] bg-bad-soft px-3.5 py-2.5 text-[13.5px] text-bad'>{error}</p>}
+        </section>
     )
 }

@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { saveConsultationPlan } from '@/app/actions/casePrep'
+import { btn, fieldArea } from '@/app/components/ui'
+import { StepHead } from './ConfidenceRatings'
 
 export default function ConsultationPlan({ caseId, initialPlan = '' }) {
     const [plan, setPlan] = useState(initialPlan)
@@ -27,26 +29,26 @@ export default function ConsultationPlan({ caseId, initialPlan = '' }) {
     }
 
     return (
-        <div className="flex flex-col gap-4 rounded-2xl border border-brand-secondary bg-white p-4 sm:p-6">
-            <div className='border-b border-gray-200 pb-3 font-semibold text-deep-blue'>
-                Consultation Plan
-            </div>
+        <div className="flex flex-col gap-3 border-t border-line pt-4">
+            <StepHead n={2} done={savedPlan.trim().length > 0} title='Consultation plan' hint='What will you ask, and in what order?' />
+            <label className='sr-only' htmlFor={`plan-${caseId}`}>Consultation plan</label>
             <textarea
+                id={`plan-${caseId}`}
                 value={plan}
                 onChange={(e) => { setPlan(e.target.value); setStatus('') }}
                 maxLength={10000}
-                rows={8}
-                className='w-full rounded-lg border border-gray-200 p-4 outline-none focus:border-light-blue focus:ring-2 focus:ring-light-blue/20'
-                placeholder='Add your consultation plan here...'
+                rows={7}
+                className={fieldArea}
+                placeholder='Introduce myself · SOCRATES for the main symptom · Red flags · PMH, meds, allergies · Ideas, concerns, expectations'
             />
-            {status && <p className={`text-sm ${status === 'Saved' ? 'text-green-600' : 'text-red-600'}`}>{status}</p>}
-            <button
-                onClick={handleSave}
-                disabled={isSaving || !hasChanges}
-                className='border border-gray-200 p-2 rounded-lg w-full bg-light-blue text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-50'
-            >
-                {isSaving ? 'Saving...' : 'Save'}
-            </button>
+            <div className='flex items-center justify-between gap-3'>
+                <span className={`text-[12.5px] ${status && status !== 'Saved' ? 'text-bad' : status ? 'text-good' : 'text-ink-3'}`}>
+                    {status || (hasChanges ? 'Unsaved changes' : savedPlan ? 'Saved' : 'Not saved yet')}
+                </span>
+                <button onClick={handleSave} disabled={isSaving || !hasChanges} className={btn('primary', 'sm')}>
+                    {isSaving ? 'Saving...' : 'Save plan'}
+                </button>
+            </div>
         </div>
     )
 }

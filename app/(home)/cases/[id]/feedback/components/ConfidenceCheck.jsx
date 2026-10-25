@@ -1,42 +1,43 @@
 import React from 'react'
-import { Gauge } from 'lucide-react'
-import { IconTile } from './ui'
+import { Chip, Meter } from '@/app/components/ui'
 
 const VERDICTS = {
-    calibrated: { label: 'Well calibrated', className: 'bg-green-100 text-green-700' },
-    overconfident: { label: 'Overconfident', className: 'bg-amber-100 text-amber-700' },
-    underconfident: { label: 'Underconfident', className: 'bg-brand-primary text-light-blue' },
+    calibrated: { label: 'Well calibrated', tone: 'good' },
+    overconfident: { label: 'Overconfident', tone: 'warn' },
+    underconfident: { label: 'Underconfident', tone: 'accent' },
 }
 
 export default function ConfidenceCheck({ rows }) {
     const overconfident = rows.filter((r) => r.verdict === 'overconfident').map((r) => r.skill.toLowerCase())
 
     return (
-        <section className='rounded-2xl border border-brand-secondary bg-white p-4 sm:p-6'>
-            <div className='flex items-center gap-3'>
-                <IconTile icon={Gauge} />
-                <div>
-                    <div className='eyebrow'>Self-assessment</div>
-                    <h2 className='mt-0.5 text-lg font-bold leading-tight'>Confidence check</h2>
-                </div>
+        <section className='card p-5 sm:p-[26px]'>
+            <div className='mb-[18px] flex flex-col gap-1.5'>
+                <h2 className='text-[22px] font-bold'>Confidence check</h2>
+                <p className='text-[13.5px] text-ink-2'>
+                    {overconfident.length > 0
+                        ? `You rated yourself higher than you scored in ${overconfident.join(' and ')}. These are worth extra practice.`
+                        : 'How confident you felt before the case, compared with how you scored.'}
+                </p>
             </div>
-            <p className='mt-1 text-sm text-Secondary-Text'>
-                {overconfident.length > 0
-                    ? `You rated yourself higher than you scored in ${overconfident.join(' and ')}. These are worth extra practice.`
-                    : 'How confident you felt before the case, compared with how you scored.'}
-            </p>
 
-            <ul className='mt-4 divide-y divide-brand-secondary'>
+            <ul>
                 {rows.map((row) => {
                     const verdict = VERDICTS[row.verdict]
                     return (
-                        <li key={row.skill} className='flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between'>
-                            <div className='font-medium'>{row.skill}</div>
-                            <div className='flex flex-wrap items-center gap-3 text-sm'>
-                                <span className='text-Secondary-Text'>Confidence <strong className='text-deep-blue'>{row.rating}/5</strong></span>
-                                <span className='text-Secondary-Text'>Score <strong className='text-deep-blue'>{row.score}%</strong></span>
-                                <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${verdict.className}`}>{verdict.label}</span>
-                            </div>
+                        <li key={row.skill} className='grid grid-cols-2 items-center gap-[18px] border-t border-line py-3.5 first:border-t-0 sm:grid-cols-[minmax(0,1.3fr)_minmax(0,.8fr)_minmax(0,1fr)_auto]'>
+                            <b className='col-span-2 text-sm sm:col-span-1'>{row.skill}</b>
+                            <span className='flex flex-col gap-1.5'>
+                                <span className='text-xs text-ink-3'>Confidence {row.rating}/5</span>
+                                <span className='inline-flex gap-1' aria-hidden>
+                                    {[1, 2, 3, 4, 5].map((n) => <i key={n} className={`h-2 w-[18px] rounded-[3px] ${n <= row.rating ? 'bg-accent' : 'bg-surface-3'}`} />)}
+                                </span>
+                            </span>
+                            <span className='flex flex-col gap-1.5'>
+                                <span className='text-xs text-ink-3'>Score {row.score}%</span>
+                                <Meter value={row.score} n={20} size='sm' />
+                            </span>
+                            <span className='col-span-2 sm:col-span-1'><Chip tone={verdict.tone}>{verdict.label}</Chip></span>
                         </li>
                     )
                 })}

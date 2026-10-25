@@ -1,49 +1,56 @@
 import React from 'react'
-import { Bell, CalendarDays } from 'lucide-react'
+import { Bell } from 'lucide-react'
 import PageHeader, { PageContainer } from '@/app/components/PageHeader'
+import { Chip, Empty } from '@/app/components/ui'
+
+const longDate = (value) => new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+
+export function AnnouncementRow({ announcement, children }) {
+    const date = new Date(announcement.publishedAt)
+    return (
+        <article className='card grid gap-2.5 p-5 sm:grid-cols-[76px_minmax(0,1fr)_auto] sm:items-start sm:gap-5 sm:p-[26px]'>
+            <div className='flex items-baseline gap-2 sm:flex-col sm:gap-1'>
+                <span className='num text-[26px] tracking-[-0.03em]'>{date.getDate()}</span>
+                <small className='text-[12.5px] font-medium text-ink-3'>{date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}</small>
+            </div>
+            <div className='flex min-w-0 flex-col gap-2'>
+                <div className='flex flex-wrap gap-2'>
+                    {announcement.type && <Chip>{announcement.type}</Chip>}
+                    {announcement.isPublished === false && <Chip dot>Hidden</Chip>}
+                </div>
+                <h3 className='text-[19px] font-bold'>{announcement.title}</h3>
+                <p className='text-ink-2'>{announcement.description}</p>
+            </div>
+            {children}
+        </article>
+    )
+}
 
 export default function Announcements({ announcements }) {
+    const [latest, ...rest] = announcements
+
     return (
         <PageContainer>
-            <PageHeader
-                eyebrow='Stay informed'
-                title='Announcements'
-                description='Stay updated with the latest news and updates from MedSimAI.'
-                icon={Bell}
-            />
+            <PageHeader title='Announcements' description='News and updates from MedSimAI.' />
 
-            <div className="flex max-w-4xl flex-col gap-4">
-                {announcements.length === 0 && (
-                    <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-Secondary-Text">
-                        No announcements right now.
+            {!latest &&
+                <div className='card'><Empty icon={Bell} title='No announcements right now' /></div>}
+
+            {latest &&
+                <article className='hero flex flex-col gap-3.5 p-6 sm:p-10'>
+                    <div className='flex flex-wrap items-center gap-2'>
+                        <Chip tone='glass'>Latest</Chip>
+                        {latest.type && <Chip tone='glass'>{latest.type}</Chip>}
+                        <span className='text-[12.5px] text-on-hero-2'>{longDate(latest.publishedAt)}</span>
                     </div>
-                )}
+                    <h2 className='text-[28px] font-bold tracking-[-0.035em] text-on-hero sm:text-[38px]'>{latest.title}</h2>
+                    <p className='max-w-[60ch] text-base text-on-hero-2'>{latest.description}</p>
+                </article>}
 
-                {announcements.map((announcement) => (
-                    <article
-                        key={announcement._id}
-                        className="rounded-2xl border border-brand-secondary bg-white p-4 transition hover:border-light-blue/40 hover:shadow-sm sm:p-6"
-                    >
-                        <div className="flex flex-wrap items-center gap-3">
-                            <span className="rounded-full bg-light-blue/10 px-3 py-1 text-xs font-medium text-light-blue">
-                                {announcement.type}
-                            </span>
-                            <span className="flex items-center gap-1.5 text-xs text-gray-500">
-                                <CalendarDays className="h-4 w-4" />
-                                {new Date(announcement.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                            </span>
-                        </div>
-
-                        <h2 className="mt-3 text-lg font-semibold text-gray-900">
-                            {announcement.title}
-                        </h2>
-
-                        <p className="mt-2 text-sm leading-6 text-gray-600">
-                            {announcement.description}
-                        </p>
-                    </article>
-                ))}
-            </div>
+            {rest.length > 0 &&
+                <div className='flex flex-col gap-2.5'>
+                    {rest.map((a) => <AnnouncementRow key={a._id} announcement={a} />)}
+                </div>}
         </PageContainer>
     )
 }

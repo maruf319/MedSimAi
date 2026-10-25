@@ -12,7 +12,7 @@ export default function Loading() {
             </SkeletonCard>
             <div className='grid gap-6 lg:grid-cols-2'>
                 {[0, 1, 2, 3].map((i) =>
-                    <div key={i} className='overflow-hidden rounded-2xl border border-brand-secondary bg-white'>
+                    <div key={i} className='overflow-hidden rounded-2xl card'>
                         <div className='flex flex-col gap-4 p-4 sm:flex-row sm:p-5'>
                             <Bone className='h-44 shrink-0 rounded-xl sm:h-32 sm:w-32' />
                             <div className='flex flex-1 flex-col gap-3'>
@@ -25,7 +25,7 @@ export default function Loading() {
                                 </div>
                             </div>
                         </div>
-                        <div className='border-t border-brand-secondary p-4 sm:px-5'>
+                        <div className='border-t border-line p-4 sm:px-5'>
                             <Bone className='ml-auto h-10 w-full rounded-full sm:w-32' />
                         </div>
                     </div>)}

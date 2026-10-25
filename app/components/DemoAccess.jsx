@@ -1,27 +1,25 @@
 'use client'
 
 import { useActionState, useState } from 'react'
-import { GraduationCap, ShieldCheck } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { demoSignin } from '@/app/actions/auth'
+import { Divider, FormError } from './AuthLayout'
 
 const OPTIONS = [
-    { role: 'student', label: 'Student demo', hint: 'Browse cases and sample AI feedback', icon: GraduationCap },
-    { role: 'admin', label: 'Admin demo', hint: 'Browse the CMS (read-only)', icon: ShieldCheck },
+    { role: 'student', label: 'Student demo', hint: 'Browse cases and sample AI feedback' },
+    { role: 'admin', label: 'Admin demo', hint: 'Browse the case manager, read-only' },
 ]
 
 export default function DemoAccess({ roles = ['student', 'admin'] }) {
     const [state, formAction, pending] = useActionState(demoSignin, null)
     const [chosen, setChosen] = useState(null)
+    const options = OPTIONS.filter((o) => roles.includes(o.role))
 
     return (
         <div className='flex w-full flex-col gap-3'>
-            <div className='flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-Secondary-Text'>
-                <span className='h-px flex-1 bg-brand-secondary' />
-                Or explore the demo
-                <span className='h-px flex-1 bg-brand-secondary' />
-            </div>
-            <form action={formAction} className='grid gap-2'>
-                {OPTIONS.filter((o) => roles.includes(o.role)).map(({ role, label, hint, icon: Icon }) =>
+            <Divider>or explore the demo</Divider>
+            <form action={formAction} className={`grid gap-3 ${options.length > 1 ? 'sm:grid-cols-2' : ''}`}>
+                {options.map(({ role, label, hint }) =>
                     <button
                         key={role}
                         type='submit'
@@ -29,18 +27,16 @@ export default function DemoAccess({ roles = ['student', 'admin'] }) {
                         value={role}
                         disabled={pending}
                         onClick={() => setChosen(role)}
-                        className='flex items-center gap-3 rounded-2xl border border-brand-secondary bg-white px-4 py-3 text-left hover:border-light-blue hover:bg-brand-primary/40 cursor-pointer disabled:cursor-wait disabled:opacity-60'
+                        className='card tint flex cursor-pointer flex-col gap-1.5 rounded-[18px] p-[18px] text-left transition hover:shadow-[0_0_0_1px_var(--accent)] disabled:cursor-wait disabled:opacity-60'
                     >
-                        <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-primary text-light-blue'>
-                            <Icon className='h-4 w-4' aria-hidden />
-                        </span>
-                        <span className='min-w-0'>
-                            <span className='block text-sm font-semibold text-deep-blue'>{pending && chosen === role ? 'Signing in...' : label}</span>
-                            <span className='block text-xs text-Secondary-Text'>{hint}</span>
-                        </span>
+                        <b className='flex items-center justify-between gap-2 font-display text-base font-bold'>
+                            {pending && chosen === role ? 'Signing in...' : label}
+                            <ArrowRight className='h-4 w-4' aria-hidden />
+                        </b>
+                        <span className='text-[13px] leading-snug text-ink-2'>{hint}</span>
                     </button>)}
             </form>
-            {state?.error && <p className='text-sm text-red-600'>{state.error}</p>}
+            <FormError>{state?.error}</FormError>
         </div>
     )
 }

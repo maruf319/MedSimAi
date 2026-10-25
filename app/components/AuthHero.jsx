@@ -1,34 +1,50 @@
 import React from 'react'
-import { MessageSquareText, Sparkles, Stethoscope } from 'lucide-react'
+import Image from 'next/image'
+import { Meter } from './ui'
 
-const FEATURES = [
-    { icon: Stethoscope, title: 'Realistic cases', text: 'Patients with full histories across specialties' },
-    { icon: MessageSquareText, title: 'AI patients', text: 'Take a history in natural conversation' },
-    { icon: Sparkles, title: 'Instant feedback', text: 'Scored on consultation, reasoning and communication' },
+// Illustrative sample shown on the sign-in pages
+const SAMPLE = [
+    ['Consultation', 88],
+    ['Clinical reasoning', 84],
+    ['Communication', 86],
 ]
 
-export default function AuthHero({ title = 'Compassionate care starts with confident practice.' }) {
+const FADE = 'linear-gradient(to bottom, #000 48%, rgb(0 0 0 / 0.55) 72%, transparent 97%)'
+
+export default function AuthHero({ title = 'Practise the consultation before it’s real.' }) {
     return (
-        <div className='hero-gradient relative hidden h-full min-h-dvh overflow-hidden lg:flex'>
-            <div aria-hidden className='pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-light-blue/25 blur-3xl' />
-            <div aria-hidden className='pointer-events-none absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-[#0F2640]/40 blur-3xl' />
-            <div className='relative flex w-full flex-col justify-between p-12 text-white'>
-                <div className='text-sm font-medium tracking-wide text-white/80'>MedSimAI · Clinical simulation</div>
-                <div className='max-w-lg'>
-                    <h2 className='text-4xl font-bold leading-tight text-white xl:text-5xl'>{title}</h2>
-                    <p className='mt-4 text-lg text-white/85'>
-                        Practise patient consultations with AI, then learn exactly what to improve.
-                    </p>
+        <aside aria-hidden className='hero m-3 flex min-h-[340px] flex-col justify-between gap-10 p-7 sm:p-12 lg:m-3.5 lg:min-h-0 lg:p-14'>
+            <Image
+                src='/auth/doctor.webp'
+                alt=''
+                width={522}
+                height={900}
+                priority
+                className='pointer-events-none absolute bottom-0 right-[3%] h-[70%] w-auto max-w-none select-none'
+                style={{ WebkitMaskImage: FADE, maskImage: FADE }}
+            />
+            <div className='relative z-[1] flex max-w-[56%] flex-col gap-[18px] lg:max-w-[520px]'>
+                <h2 className='display text-[34px] text-on-hero sm:text-[46px] xl:text-[58px]'>{title}</h2>
+                <p className='max-w-[40ch] text-[15px] text-on-hero-2 sm:text-[17px]'>Talk to AI patients, then see exactly what to improve.</p>
+            </div>
+            <div className='glass relative z-[1] hidden max-w-[300px] flex-col gap-[18px] rounded-[26px] p-[22px] lg:flex'>
+                <div className='flex items-center justify-between gap-3 text-[13px] text-on-hero-2'>
+                    <span>Session feedback · Acute Chest Pain</span>
+                    <span className='shrink-0 whitespace-nowrap rounded-full bg-hero-glass px-3 py-1 text-xs text-on-hero'>Very good</span>
                 </div>
-                <div className='glass grid grid-cols-3 divide-x divide-white/25 rounded-2xl'>
-                    {FEATURES.map(({ icon: Icon, title: featureTitle, text }) =>
-                        <div key={featureTitle} className='flex flex-col gap-2 p-5'>
-                            <Icon className='h-6 w-6 text-white' strokeWidth={1.75} />
-                            <div className='font-semibold text-white'>{featureTitle}</div>
-                            <div className='text-xs leading-relaxed text-white/80'>{text}</div>
+                <div className='flex items-end gap-4'>
+                    <span className='num text-[64px] sm:text-[80px]'>86</span>
+                    <span className='pb-2 text-[13px] text-on-hero-2'>out of 100</span>
+                </div>
+                <div className='flex flex-col gap-3'>
+                    {SAMPLE.map(([label, score]) =>
+                        <div key={label} className='grid grid-cols-[104px_minmax(0,1fr)_26px] items-center gap-3 text-[13.5px]'>
+                            <span>{label}</span>
+                            <Meter value={score} n={20} size='sm' onHero />
+                            <b className='text-right tabular-nums'>{score}</b>
                         </div>)}
                 </div>
             </div>
-        </div>
+        </aside>
     )
 }

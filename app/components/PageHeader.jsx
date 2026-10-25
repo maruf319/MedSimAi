@@ -1,52 +1,50 @@
 import React from 'react'
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 
 export function PageContainer({ children, className = '' }) {
     return (
-        <div className={`mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-10 ${className}`}>
+        <div className={`mx-auto flex w-full max-w-[1240px] flex-col gap-[22px] px-4 pb-28 pt-6 sm:px-6 lg:px-7 lg:pb-16 lg:pt-7 ${className}`}>
             {children}
         </div>
     )
 }
 
-export default function PageHeader({ eyebrow, title, description, icon: Icon, actions }) {
+/** Page title row. `eyebrow` and `icon` are accepted for compatibility but no longer shown. */
+export default function PageHeader({ title, description, actions, back }) {
     return (
-        <div className='flex flex-wrap items-end justify-between gap-4'>
-            <div className='flex min-w-0 items-start gap-4'>
-                {Icon &&
-                    <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-brand-secondary bg-white'>
-                        <Icon className='h-6 w-6 text-light-blue' strokeWidth={1.75} />
-                    </div>}
-                <div className='min-w-0'>
-                    {eyebrow && <div className='eyebrow'>{eyebrow}</div>}
-                    <h1 className='mt-0.5 text-2xl font-bold sm:text-3xl'>{title}</h1>
-                    {description && <p className='mt-1 text-sm text-Secondary-Text sm:text-base'>{description}</p>}
-                </div>
+        <div className='mb-1.5 flex flex-wrap items-end justify-between gap-5'>
+            <div className='flex min-w-0 flex-col gap-2'>
+                {back && <BackLink href={back.href}>{back.label}</BackLink>}
+                <h1 className='text-[32px] font-bold leading-[1.04] tracking-[-0.035em] sm:text-[40px] lg:text-[46px]'>{title}</h1>
+                {description && <p className='text-[15.5px] text-ink-2'>{description}</p>}
             </div>
-            {actions && <div className='flex flex-wrap items-center gap-2'>{actions}</div>}
+            {actions && <div className='flex flex-wrap items-center gap-2.5'>{actions}</div>}
         </div>
     )
 }
 
+export function BackLink({ href, children }) {
+    return (
+        <Link href={href} className='inline-flex w-fit items-center gap-1.5 text-[13.5px] font-medium text-ink-2 hover:text-ink'>
+            <ArrowLeft className='h-4 w-4' aria-hidden /> {children}
+        </Link>
+    )
+}
+
+/** Level-1 hero card */
 export function HeroBanner({ children, className = '' }) {
-    return (
-        <div className={`hero-gradient relative overflow-hidden rounded-3xl text-white ${className}`}>
-            <div aria-hidden className='pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full bg-light-blue/25 blur-3xl' />
-            <div aria-hidden className='pointer-events-none absolute -bottom-28 left-1/4 h-64 w-64 rounded-full bg-[#0F2640]/40 blur-3xl' />
-            <div className='relative'>{children}</div>
-        </div>
-    )
+    return <section className={`hero p-6 sm:p-8 ${className}`}>{children}</section>
 }
 
+/** Frosted stats row for use inside a hero */
 export function GlassStats({ stats }) {
-    const layout = stats.length === 4
-        ? 'grid-cols-2 sm:grid-cols-4 [&>*:nth-child(-n+2)]:border-b sm:[&>*:nth-child(-n+2)]:border-b-0 [&>*:nth-child(even)]:border-l sm:[&>*:not(:first-child)]:border-l'
-        : 'grid-cols-3 [&>*:not(:first-child)]:border-l'
     return (
-        <div className={`glass grid rounded-2xl [&>*]:border-white/25 ${layout}`}>
-            {stats.map((stat) =>
-                <div key={stat.label} className='px-3 py-4 text-center sm:px-6 sm:py-5'>
-                    <div className='text-2xl font-semibold text-white sm:text-4xl'>{stat.value}</div>
-                    <div className='mt-1 text-[11px] leading-tight text-white/80 sm:text-sm'>{stat.label}</div>
+        <div className={`glass grid rounded-[26px] py-5 ${stats.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
+            {stats.map((stat, i) =>
+                <div key={stat.label} className={`flex flex-col items-center gap-2 px-2 text-center ${i > 0 ? 'border-l border-on-hero-line' : ''}`}>
+                    <span className='num text-[30px] sm:text-[48px]'>{stat.value}</span>
+                    <span className='text-xs text-on-hero-2 sm:text-[13px]'>{stat.label}</span>
                 </div>)}
         </div>
     )

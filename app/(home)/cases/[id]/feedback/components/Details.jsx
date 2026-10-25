@@ -1,48 +1,35 @@
 import React from 'react'
-import { CircleCheck, Lightbulb, MoveUpRight, ThumbsUp, TrendingUp } from 'lucide-react'
+import { Lightbulb, ThumbsUp, TrendingUp } from 'lucide-react'
 
-function PointPanel({ icon: Icon, title, points, itemIcon: ItemIcon, panelClass, iconClass }) {
+const TONES = {
+    good: 'bg-good-soft [&_h3]:text-good',
+    warn: 'bg-warn-soft [&_h3]:text-warn',
+    accent: 'bg-accent-soft [&_h3]:text-accent-ink',
+}
+
+function PointPanel({ icon: Icon, title, points, tone, ordered = false, empty }) {
+    const List = ordered ? 'ol' : 'ul'
     return (
-        <div className={`rounded-xl p-4 ${panelClass}`}>
-            <h3 className='flex items-center gap-2 pb-3 font-semibold'>
-                <Icon className={`h-4 w-4 ${iconClass}`} aria-hidden /> {title}
+        <div className={`flex flex-col gap-2 rounded-[18px] p-[18px] ${TONES[tone]}`}>
+            <h3 className='flex items-center gap-2 font-sans text-[13.5px] font-bold'>
+                <Icon className='h-4 w-4' aria-hidden /> {title}
             </h3>
             {points.length === 0
-                ? <p className='text-sm text-Secondary-Text'>Nothing noted for this category.</p>
-                : <ul className='flex flex-col gap-2.5'>
-                    {points.map((item, idx) =>
-                        <li key={idx} className='flex gap-2 text-sm'>
-                            <ItemIcon className={`mt-0.5 h-4 w-4 shrink-0 ${iconClass}`} aria-hidden />
-                            <span className='text-gray-700'>{item}</span>
-                        </li>)}
-                </ul>}
+                ? <p className='text-[13.5px] text-ink-2'>{empty}</p>
+                : <List className={`flex flex-col gap-1.5 pl-[18px] ${ordered ? 'list-decimal' : 'list-disc'}`}>
+                    {points.map((item, idx) => <li key={idx} className='text-[13.5px] leading-snug'>{item}</li>)}
+                </List>}
         </div>
     )
 }
 
 export default function Details({ strengths, improvements, recommendations }) {
     return (
-        <div className='flex flex-col gap-4'>
-            <div className='grid gap-4 md:grid-cols-2'>
-                <PointPanel icon={ThumbsUp} itemIcon={CircleCheck} title='What went well' points={strengths}
-                    panelClass='bg-green-50 ring-1 ring-green-100' iconClass='text-green-600' />
-                <PointPanel icon={TrendingUp} itemIcon={MoveUpRight} title='Areas to improve' points={improvements}
-                    panelClass='bg-amber-50 ring-1 ring-amber-100' iconClass='text-amber-600' />
-            </div>
-
+        <div className='grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(210px,1fr))]'>
+            <PointPanel icon={ThumbsUp} title='What went well' points={strengths} tone='good' empty='Nothing noted for this category.' />
+            <PointPanel icon={TrendingUp} title='Areas to improve' points={improvements} tone='warn' empty='Nothing noted for this category.' />
             {recommendations.length > 0 &&
-                <div>
-                    <h3 className='flex items-center gap-2 pb-3 font-semibold'>
-                        <Lightbulb className='h-4 w-4 text-light-blue' aria-hidden /> Recommendations for next time
-                    </h3>
-                    <ol className='flex flex-col gap-2'>
-                        {recommendations.map((val, idx) =>
-                            <li key={idx} className='flex gap-3 rounded-xl border border-brand-secondary p-3 text-sm'>
-                                <span className='flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-light-blue text-xs font-semibold text-white'>{idx + 1}</span>
-                                <span className='text-gray-700'>{val}</span>
-                            </li>)}
-                    </ol>
-                </div>}
+                <PointPanel icon={Lightbulb} title='Next time' points={recommendations} tone='accent' ordered />}
         </div>
     )
 }

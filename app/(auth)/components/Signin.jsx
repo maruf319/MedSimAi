@@ -1,50 +1,35 @@
 'use client'
 import { signin } from '@/app/actions/auth';
 import AuthField from '@/app/components/AuthField';
-import AuthHero from '@/app/components/AuthHero';
+import AuthLayout, { FormError } from '@/app/components/AuthLayout';
 import DemoAccess from '@/app/components/DemoAccess';
-import { Lock, Mail } from 'lucide-react'
-import Image from 'next/image'
+import { btn } from '@/app/components/ui';
+import { ArrowRight, Lock, Mail } from 'lucide-react'
 import Link from 'next/link';
 import { useActionState } from 'react';
 
 export default function Signin({ demo }) {
     const [state, formAction, pending] = useActionState(signin, null);
     return (
-        <div className='grid min-h-full w-full items-center lg:grid-cols-2'>
-            <div className='flex w-full flex-col items-center gap-10 px-4 py-10 sm:gap-14'>
-                <div className='w-full max-w-92'>
-                    <Image height={32} width={182} alt='MedSimAI' src={'/logo/medsimailogo.png'}
-                        className='mb-10 h-8 w-[182px]' />
-                    <div className='eyebrow'>{'Welcome back'}</div>
-                    <div className='mt-1 text-3xl font-bold sm:text-4xl'>Sign in to MedSimAI</div>
-                    <div className='mt-2 text-Secondary-Text'>Enter your email and password to continue.</div>
-                </div>
-                <form action={formAction} className='max-w-92 w-full flex flex-col gap-4'>
-                    <AuthField label='Email address' icon={Mail} name='email' type='email' autoComplete='email' />
-                    <AuthField label='Password' icon={Lock} name='password' type='password' autoComplete='current-password' />
-                    {state?.error && <p className='text-sm text-red-600'>{state.error}</p>}
-                    <button
-                        type='submit'
-                        disabled={pending}
-                        className='flex items-center justify-center rounded-full bg-light-blue px-5 py-3 font-semibold text-white hover:bg-primary-dark cursor-pointer disabled:opacity-60'
-                    >
-                        {pending ? 'Signing in...' : 'Sign in'}
-                    </button>
+        <AuthLayout title='Sign in to MedSimAI' description='Welcome back. Enter your details to continue.'>
+            <form action={formAction} className='flex flex-col gap-4'>
+                <AuthField label='Email address' icon={Mail} name='email' type='email' autoComplete='email' placeholder='you@university.ac.uk' />
+                <AuthField label='Password' icon={Lock} name='password' type='password' autoComplete='current-password' placeholder='Your password' />
+                <FormError>{state?.error}</FormError>
+                <button type='submit' disabled={pending} className={btn('primary', 'md', 'w-full')}>
+                    {pending ? 'Signing in...' : <>Sign in <ArrowRight aria-hidden /></>}
+                </button>
+            </form>
 
-                    <div className='text-Secondary-Text'>
-                        Don&apos;t have an account? <Link href='/signup' className='text-light-blue hover:underline'>Sign up</Link>
-                    </div>
-                </form>
+            <p className='text-[13.5px] text-ink-2'>
+                Don&apos;t have an account? <Link href='/signup' className='font-semibold text-accent-ink underline underline-offset-[3px]'>Sign up</Link>
+            </p>
 
-                {demo &&
-                    <div className='-mt-4 w-full max-w-92 sm:-mt-8'>
-                        <DemoAccess />
-                    </div>}
+            {demo && <DemoAccess />}
 
-            </div>
-
-            <AuthHero />
-        </div>
+            <p className='text-[13.5px] text-ink-2'>
+                Teaching staff? <Link href='/admin-dashboard/login' className='font-semibold text-accent-ink underline underline-offset-[3px]'>Admin sign in</Link>
+            </p>
+        </AuthLayout>
     )
 }

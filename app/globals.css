@@ -1,81 +1,283 @@
 @import "tailwindcss";
 
 /*
-  MedSimAI theme, modelled on a clean clinical look: one medical blue for actions,
-  deep navy for headings, blue-grey text and soft blue tints. The grey scale is
-  replaced with blue-greys so every border, background and muted text matches.
+  MedSimAI sea-glass theme.
+  One hero card per screen uses the misty teal → slate → near-black gradient (same in
+  light and dark). Supporting cards are softly tinted, everything else is a plain surface
+  with a hairline edge. No drop shadows. Accent is a muted teal.
 */
-@theme {
-  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 
-  /* Brand */
-  --color-light-blue: #307BC4;      /* primary: buttons, links, highlights */
-  --color-primary-dark: #2563A3;    /* primary hover */
-  --color-deep-blue: #274760;       /* headings, navigation */
-  --color-brand-primary: #EAF3FB;   /* light blue tint for chips and panels */
-  --color-brand-secondary: #CDE1F3; /* light blue borders */
-  --color-Secondary-Text: #5F7A91;  /* body and muted text */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-  /* Blue-grey neutrals in place of Tailwind's grey */
-  --color-gray-50: #F5F9FD;
-  --color-gray-100: #EBF2F9;
-  --color-gray-200: #D9E6F2;
-  --color-gray-300: #BACFE3;
-  --color-gray-400: #8DA6BE;
-  --color-gray-500: #6A8299;
-  --color-gray-600: #50687F;
-  --color-gray-700: #3B5268;
-  --color-gray-800: #2C4256;
-  --color-gray-900: #22394C;
+:root,
+[data-theme='light'] {
+  --bg: #EDF2F2;
+  --surface: #FFFFFF;
+  --surface-2: #F2F6F6;
+  --surface-3: #E2EAEA;
+  --line: #DCE5E5;
+  --ink: #0D1516;
+  --ink-2: #475859;
+  --ink-3: #839495;
+  --accent: #3B6A6F;
+  --accent-2: #7FAAAE;
+  --accent-soft: #E0EBEB;
+  --accent-ink: #2D575B;
+  --tint-a: rgb(59 106 111 / 0.09);
+  --tint-b: rgb(127 170 174 / 0.05);
+  --good: #1E7D52;
+  --good-soft: #DCF0E5;
+  --warn: #8C5A06;
+  --warn-soft: #F7EACB;
+  --bad: #B23E2E;
+  --bad-soft: #F8E0DA;
+  --scrim: rgb(6 10 11 / 0.45);
+  color-scheme: light;
+}
 
-  /* Primary hover used by existing buttons */
-  --color-blue-500: #2563A3;
+[data-theme='dark'] {
+  --bg: #090D0E;
+  --surface: #101718;
+  --surface-2: #162022;
+  --surface-3: #1F2B2D;
+  --line: #1C2729;
+  --ink: #EDF3F3;
+  --ink-2: #A2B3B4;
+  --ink-3: #6A7B7D;
+  --accent: #8FBBBF;
+  --accent-2: #D2E9E7;
+  --accent-soft: rgb(143 187 191 / 0.14);
+  --accent-ink: #BBD8DA;
+  --tint-a: rgb(143 187 191 / 0.12);
+  --tint-b: rgb(210 233 231 / 0.04);
+  --good: #7FD3A6;
+  --good-soft: rgb(127 211 166 / 0.12);
+  --warn: #E8C37A;
+  --warn-soft: rgb(232 195 122 / 0.12);
+  --bad: #F29A88;
+  --bad-soft: rgb(242 154 136 / 0.12);
+  --scrim: rgb(0 0 0 / 0.55);
+  color-scheme: dark;
+}
+
+/* Same in both themes */
+:root {
+  --hero:
+    radial-gradient(70% 65% at 6% -8%, #A9C7C9 0%, rgb(169 199 201 / 0) 62%),
+    radial-gradient(60% 55% at 96% -6%, #8DB2BD 0%, rgb(141 178 189 / 0) 58%),
+    radial-gradient(70% 70% at 30% 40%, rgb(98 133 138 / 0.55) 0%, rgb(98 133 138 / 0) 70%),
+    linear-gradient(165deg, #5D7F84 0%, #34494C 34%, #172124 62%, #0A0F10 100%);
+  --grad: linear-gradient(150deg, #7EA4A8 0%, #4D7075 50%, #2C4245 100%);
+  --on-hero: #FFFFFF;
+  --on-hero-2: rgb(255 255 255 / 0.78);
+  --on-hero-3: rgb(255 255 255 / 0.55);
+  --on-hero-line: rgb(255 255 255 / 0.22);
+  --hero-glass: rgb(255 255 255 / 0.12);
+  --hero-btn-ink: #1A2E31;
+  --mint: #D2E9E7;
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+@theme inline {
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-on-hero: var(--on-hero);
+  --color-on-hero-2: var(--on-hero-2);
+  --color-on-hero-3: var(--on-hero-3);
+  --color-on-hero-line: var(--on-hero-line);
+  --color-hero-glass: var(--hero-glass);
+  --color-hero-btn-ink: var(--hero-btn-ink);
+  --color-scrim: var(--scrim);
+
+  /* Older names still used in a few places, mapped onto the new palette */
+  --color-light-blue: var(--accent);
+  --color-primary-dark: var(--accent-ink);
+  --color-deep-blue: var(--ink);
+  --color-brand-primary: var(--accent-soft);
+  --color-brand-secondary: var(--line);
+  --color-Secondary-Text: var(--ink-2);
+  --color-gray-50: var(--surface-2);
+  --color-gray-100: var(--surface-2);
+  --color-gray-200: var(--line);
+  --color-gray-300: var(--line);
+  --color-gray-400: var(--ink-3);
+  --color-gray-500: var(--ink-3);
+  --color-gray-600: var(--ink-2);
+  --color-gray-700: var(--ink-2);
+  --color-gray-800: var(--ink);
+  --color-gray-900: var(--ink);
+
+  --radius-card: 26px;
+  --radius-hero: 32px;
 }
 
 @layer base {
-  body {
-    color: var(--color-deep-blue);
-    background-color: #ffffff;
+  html {
+    background-color: var(--bg);
   }
 
-  h1, h2, h3 {
-    color: var(--color-deep-blue);
-    letter-spacing: -0.01em;
+  body {
+    color: var(--ink);
+    background-color: var(--bg);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    color: inherit;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
 
   ::selection {
-    background-color: var(--color-brand-secondary);
+    background-color: var(--accent-soft);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  input, textarea, select {
+    color: var(--ink);
+  }
+
+  ::placeholder {
+    color: var(--ink-3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
   }
 }
 
-/*
-  Hero banners use the same navy as the sidebar, lifted slightly at one corner and
-  with a soft blue glow so they have depth without drifting into grey.
-*/
-@utility hero-gradient {
-  background-image:
-    radial-gradient(60% 90% at 100% 0%, rgb(48 123 196 / 0.35) 0%, transparent 70%),
-    linear-gradient(120deg, #24497A 0%, #1C3D66 50%, #16314F 100%);
+/* Level 1: the one hero card per screen */
+@utility hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--hero);
+  color: var(--on-hero);
+  border-radius: var(--radius-hero);
+  box-shadow: inset 0 0 0 1px rgb(210 233 231 / 0.1);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: var(--grain);
+    opacity: 0.18;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
 }
 
-/* Deep navy for the sidebar and mobile menu, so the bright content area stands out */
-@utility nav-gradient {
-  background-image: linear-gradient(180deg, #1C3D66 0%, #16314F 100%);
+/* Level 3: plain card with a hairline edge */
+@utility card {
+  background-color: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: 0 0 0 1px var(--line);
 }
 
-/* Frosted glass panel for content on top of the gradient */
+/* Level 2: softly tinted card for supporting actions */
+@utility tint {
+  background:
+    linear-gradient(155deg, var(--tint-a), var(--tint-b) 55%, transparent 85%),
+    var(--surface);
+}
+
+/* Frosted panel on top of the hero gradient */
 @utility glass {
-  background-color: rgb(255 255 255 / 0.14);
-  border: 1px solid rgb(255 255 255 / 0.28);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: var(--hero-glass);
+  box-shadow: inset 0 0 0 1px var(--on-hero-line);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
-/* Small uppercase label above section headings */
+/* Frosted bar on the page itself (navigation) */
+@utility frost {
+  background-color: color-mix(in oklab, var(--surface) 82%, transparent);
+  box-shadow: 0 0 0 1px var(--line);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+
+@utility bg-grad {
+  background-image: var(--grad);
+}
+
+/* Big, tight numbers */
+@utility num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+/* Inside hero cards, quieter text uses the hero tones */
+@utility on-hero-muted {
+  color: var(--on-hero-2);
+}
+
+/* Kept for any leftover usage; renders as a plain muted label (no uppercase eyebrows) */
 @utility eyebrow {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-light-blue);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+/* Glowing AI patient orb */
+@utility orb {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  flex: none;
+  background: conic-gradient(from 210deg, #4d7075, #d2e9e7, #ffffff, #8fbbbf, #4d7075);
+  box-shadow: 0 0 calc(var(--orb, 104px) * 0.3) rgb(210 233 231 / 0.3);
+  width: var(--orb, 104px);
+  animation: orb-spin 14s linear infinite;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 3%;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 56% 44%, #142023 0 44%, transparent 76%);
+    filter: blur(1.5px);
+  }
+}
+
+@keyframes orb-spin {
+  to { transform: rotate(360deg); }
 }

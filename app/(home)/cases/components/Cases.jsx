@@ -1,14 +1,31 @@
 'use client'
 import React, { useMemo, useState } from 'react'
-import { SearchIcon, SlidersHorizontal, Stethoscope } from 'lucide-react'
+import { ChevronDown, SearchIcon } from 'lucide-react'
 import CaseCard from './CaseCard'
 import PageHeader, { PageContainer } from '@/app/components/PageHeader'
+import { Button, Empty } from '@/app/components/ui'
 
 const LEVELS = ['All', 'Beginner', 'Intermediate', 'Advanced'];
-const selectClass = 'w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-light-blue focus:ring-2 focus:ring-light-blue/20';
 
 function optionsFrom(values) {
     return ['All', ...[...new Set(values.filter(Boolean))].sort()];
+}
+
+function SelectChip({ label, value, onChange, options }) {
+    const on = value !== 'All'
+    return (
+        <label className='relative'>
+            <span className='sr-only'>{label}</span>
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className={`h-10 max-w-full cursor-pointer appearance-none rounded-full pl-4 pr-9 text-[13.5px] font-medium outline-none ${on ? 'bg-accent-soft text-accent-ink' : 'bg-surface text-ink shadow-[inset_0_0_0_1px_var(--line)]'}`}
+            >
+                {options.map((o) => <option key={o} value={o}>{o === 'All' ? `${label}: All` : o}</option>)}
+            </select>
+            <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-3' aria-hidden />
+        </label>
+    )
 }
 
 export default function Cases({ data, stats = {} }) {
@@ -17,7 +34,6 @@ export default function Cases({ data, stats = {} }) {
     const [difficulty, setDifficulty] = useState('All');
     const [specialty, setSpecialty] = useState('All');
     const [casetype, setCasetype] = useState('All');
-    const [showFilters, setShowFilters] = useState(false);
 
     const specialties = useMemo(() => optionsFrom(cards.map((c) => c.specialty)), [cards]);
     const caseTypes = useMemo(() => optionsFrom(cards.flatMap((c) => c.features ?? [])), [cards]);
@@ -37,68 +53,51 @@ export default function Cases({ data, stats = {} }) {
     return (
         <PageContainer>
             <PageHeader
-                eyebrow='Case library'
-                title='Clinical Cases'
-                description={`${cards.length} ${cards.length === 1 ? 'case' : 'cases'} available`}
-                icon={Stethoscope}
+                title='Clinical cases'
+                description={hasFilters ? `${filtered.length} of ${cards.length} cases` : `${cards.length} ${cards.length === 1 ? 'case' : 'cases'} available`}
             />
 
-            <div className='flex flex-col gap-3 rounded-2xl border border-brand-secondary bg-white p-4'>
-                <div className='flex gap-2'>
-                <label className='flex flex-1 items-center gap-2 rounded-lg border border-gray-300 px-3 focus-within:border-light-blue focus-within:ring-2 focus-within:ring-light-blue/20'>
-                    <SearchIcon className='h-5 w-5 text-Secondary-Text' />
-                    <span className='sr-only'>Search cases</span>
-                    <input
-                        type='search'
-                        placeholder='Search clinical cases...'
-                        className='h-11 w-full bg-transparent outline-none'
-                        value={keyword}
-                        onChange={(e) => setKeyword(e.target.value)}
-                    />
-                </label>
-                <button
-                    type='button'
-                    onClick={() => setShowFilters((v) => !v)}
-                    aria-expanded={showFilters}
-                    className='flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 text-sm cursor-pointer sm:hidden'
-                >
-                    <SlidersHorizontal className='h-4 w-4' /> Filters
-                </button>
+            <div className='flex flex-col gap-3'>
+                <div className='flex flex-wrap items-center gap-3'>
+                    <label className='relative min-w-[220px] flex-1'>
+                        <SearchIcon className='pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-3' aria-hidden />
+                        <span className='sr-only'>Search cases</span>
+                        <input
+                            type='search'
+                            placeholder='Search clinical cases'
+                            className='h-12 w-full rounded-full border border-line bg-surface pl-[42px] pr-4 text-[14.5px] outline-none'
+                            value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
+                        />
+                    </label>
+                    <div className='inline-flex max-w-full gap-0.5 overflow-x-auto rounded-full bg-surface-2 p-1 shadow-[inset_0_0_0_1px_var(--line)]' role='group' aria-label='Difficulty'>
+                        {LEVELS.map((level) =>
+                            <button
+                                key={level}
+                                type='button'
+                                aria-pressed={difficulty === level}
+                                onClick={() => setDifficulty(level)}
+                                className={`h-9 shrink-0 cursor-pointer rounded-full px-4 text-[13.5px] font-medium ${difficulty === level ? 'bg-grad text-on-hero' : 'text-ink-2'}`}
+                            >
+                                {level}
+                            </button>)}
+                    </div>
                 </div>
-
-                <div className={`${showFilters ? 'grid' : 'hidden'} gap-3 sm:grid sm:grid-cols-3`}>
-                    <label className='flex flex-col gap-1 text-xs font-medium text-Secondary-Text'>
-                        Difficulty
-                        <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className={selectClass}>
-                            {LEVELS.map((o) => <option key={o}>{o}</option>)}
-                        </select>
-                    </label>
-                    <label className='flex flex-col gap-1 text-xs font-medium text-Secondary-Text'>
-                        Specialty
-                        <select value={specialty} onChange={(e) => setSpecialty(e.target.value)} className={selectClass}>
-                            {specialties.map((o) => <option key={o}>{o}</option>)}
-                        </select>
-                    </label>
-                    <label className='flex flex-col gap-1 text-xs font-medium text-Secondary-Text'>
-                        Case type
-                        <select value={casetype} onChange={(e) => setCasetype(e.target.value)} className={selectClass}>
-                            {caseTypes.map((o) => <option key={o}>{o}</option>)}
-                        </select>
-                    </label>
+                <div className='flex flex-wrap items-center gap-2.5'>
+                    <SelectChip label='Specialty' value={specialty} onChange={setSpecialty} options={specialties} />
+                    <SelectChip label='Case type' value={casetype} onChange={setCasetype} options={caseTypes} />
+                    {hasFilters &&
+                        <button type='button' onClick={clearFilters} className='cursor-pointer px-2 text-[13px] font-semibold text-ink underline underline-offset-[3px]'>Clear all</button>}
                 </div>
-
-                {hasFilters &&
-                    <div className='flex items-center justify-between text-sm text-Secondary-Text'>
-                        <span>Showing {filtered.length} of {cards.length}</span>
-                        <button type='button' onClick={clearFilters} className='text-light-blue hover:underline cursor-pointer'>Clear filters</button>
-                    </div>}
             </div>
 
             {filtered.length === 0
-                ? <div className='rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-Secondary-Text'>
-                    No cases match your search.
+                ? <div className='card'>
+                    <Empty icon={SearchIcon} title='No cases match these filters'>
+                        <Button size='sm' onClick={clearFilters}>Clear filters</Button>
+                    </Empty>
                 </div>
-                : <div className='grid gap-6 lg:grid-cols-2'>
+                : <div className='grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(310px,1fr))]'>
                     {filtered.map((item, index) => (
                         <CaseCard
                             key={item._id}

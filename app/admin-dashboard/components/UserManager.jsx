@@ -2,10 +2,15 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { ChevronDown, KeyRound, Trash2 } from 'lucide-react'
 import { createUser, deleteUser, resetPassword, setUserRole } from '@/app/actions/adminUsers'
+import { btn, Chip, fieldInput, Meter } from '@/app/components/ui'
 
-const inputClass = 'w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-light-blue'
 const emptyForm = { name: '', email: '', password: '', role: 'student' }
+
+function initials(name = '') {
+    return name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase() || '?'
+}
 
 export default function UserManager({ users, currentUserId }) {
     const router = useRouter()
@@ -45,96 +50,122 @@ export default function UserManager({ users, currentUserId }) {
 
     const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }))
 
-    const average = (user) => user.averageScore === null ? '–' : `${user.averageScore}%`
-
     const roleSelect = (user, isSelf) => (
-        <select
-            value={user.role}
-            disabled={isSelf || isBusy}
-            aria-label={`Role for ${user.email}`}
-            onChange={(e) => run(() => setUserRole(user._id, e.target.value), `${user.email} is now ${e.target.value === 'admin' ? 'an admin' : 'a student'}.`)}
-            className='rounded border border-gray-300 px-2 py-1 disabled:opacity-60'
-        >
-            <option value='student'>Student</option>
-            <option value='admin'>Admin</option>
-        </select>
+        <label className='relative inline-flex'>
+            <span className='sr-only'>Role for {user.email}</span>
+            <select
+                value={user.role}
+                disabled={isSelf || isBusy}
+                onChange={(e) => run(() => setUserRole(user._id, e.target.value), `${user.email} is now ${e.target.value === 'admin' ? 'an admin' : 'a student'}.`)}
+                className='h-9 cursor-pointer appearance-none rounded-full border border-line bg-surface-2 pl-3.5 pr-8 text-[13px] outline-none disabled:cursor-default disabled:opacity-60'
+            >
+                <option value='student'>Student</option>
+                <option value='admin'>Admin</option>
+            </select>
+            <ChevronDown className='pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-3' aria-hidden />
+        </label>
     )
 
     const userActions = (user, isSelf) => (
-        <div className='flex gap-4'>
-            <button onClick={() => handleResetPassword(user)} disabled={isBusy} className='text-light-blue hover:underline cursor-pointer disabled:opacity-50'>Reset password</button>
+        <div className='flex items-center justify-end gap-1.5'>
+            <button type='button' onClick={() => handleResetPassword(user)} disabled={isBusy} className={btn('ghost', 'sm')}>
+                <KeyRound aria-hidden /> Reset password
+            </button>
             {!isSelf &&
-                <button onClick={() => handleDelete(user)} disabled={isBusy} className='text-red-600 hover:underline cursor-pointer disabled:opacity-50'>Delete</button>}
+                <button type='button' onClick={() => handleDelete(user)} disabled={isBusy} aria-label={`Delete ${user.email}`}
+                    className='grid h-[34px] w-[34px] cursor-pointer place-items-center rounded-full bg-surface shadow-[inset_0_0_0_1px_var(--line)] hover:text-bad disabled:opacity-50'>
+                    <Trash2 className='h-4 w-4' aria-hidden />
+                </button>}
         </div>
     )
 
+    const person = (user, isSelf) => (
+        <div className='flex min-w-0 items-center gap-3'>
+            <span className={`grid h-[38px] w-[38px] shrink-0 place-items-center rounded-full font-display text-[13.5px] font-bold ${isSelf ? 'bg-grad text-on-hero' : 'bg-accent-soft text-accent-ink'}`}>{initials(user.name)}</span>
+            <span className='flex min-w-0 flex-col'>
+                <span className='flex items-center gap-1.5 truncate font-semibold'>{user.name}{isSelf && <Chip tone='accent' className='!h-[22px]'>You</Chip>}</span>
+                <span className='truncate text-[12.5px] text-ink-3'>{user.email}</span>
+            </span>
+        </div>
+    )
+
+    const score = (user) => user.averageScore === null
+        ? <span className='text-ink-3'>–</span>
+        : <span className='flex items-center gap-3'><Meter value={user.averageScore} n={12} size='sm' className='w-[90px]' /><b className='tabular-nums'>{user.averageScore}%</b></span>
+
     return (
-        <div className='flex flex-col gap-6'>
+        <div className='flex flex-col gap-4'>
             <form
                 onSubmit={(e) => { e.preventDefault(); run(() => createUser(form), `Account created for ${form.email.trim().toLowerCase()}.`, () => setForm(emptyForm)) }}
-                className='flex flex-col gap-4 rounded-2xl border border-brand-secondary bg-white p-4 sm:p-6'
+                className='card tint flex flex-col gap-4 p-5 sm:p-[26px]'
             >
-                <div className='font-medium text-deep-blue'>New account</div>
+                <h2 className='text-[22px] font-bold'>New account</h2>
                 <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
-                    <input value={form.name} onChange={set('name')} placeholder='Full name' required className={inputClass} />
-                    <input value={form.email} onChange={set('email')} type='email' placeholder='Email' required className={inputClass} />
-                    <input value={form.password} onChange={set('password')} type='password' placeholder='Password (8+ characters)' minLength={8} required autoComplete='new-password' className={inputClass} />
-                    <select value={form.role} onChange={set('role')} className={inputClass}>
-                        <option value='student'>Student</option>
-                        <option value='admin'>Admin</option>
-                    </select>
+                    <label className='flex flex-col gap-[7px] text-[13px] font-semibold'>Full name
+                        <input value={form.name} onChange={set('name')} placeholder='e.g. Dr Sarah Khan' required className={`${fieldInput} font-normal`} />
+                    </label>
+                    <label className='flex flex-col gap-[7px] text-[13px] font-semibold'>Email
+                        <input value={form.email} onChange={set('email')} type='email' placeholder='name@university.ac.uk' required className={`${fieldInput} font-normal`} />
+                    </label>
+                    <label className='flex flex-col gap-[7px] text-[13px] font-semibold'>Password
+                        <input value={form.password} onChange={set('password')} type='password' placeholder='At least 8 characters' minLength={8} required autoComplete='new-password' className={`${fieldInput} font-normal`} />
+                    </label>
+                    <span className='flex flex-col gap-[7px] text-[13px] font-semibold'>Role
+                        <span className='grid h-12 grid-cols-2 gap-0.5 rounded-full bg-surface-2 p-1 shadow-[inset_0_0_0_1px_var(--line)]' role='radiogroup' aria-label='Role'>
+                            {[['student', 'Student'], ['admin', 'Admin']].map(([value, label]) =>
+                                <button key={value} type='button' role='radio' aria-checked={form.role === value} onClick={() => setForm((p) => ({ ...p, role: value }))}
+                                    className={`cursor-pointer rounded-full text-[13.5px] font-medium ${form.role === value ? 'bg-grad text-on-hero' : 'text-ink-2'}`}>
+                                    {label}
+                                </button>)}
+                        </span>
+                    </span>
                 </div>
-                <div className='flex items-center gap-4'>
-                    {message && <p className={`text-sm ${message.ok ? 'text-green-600' : 'text-red-600'}`}>{message.text}</p>}
-                    <button type='submit' disabled={isBusy} className='ml-auto rounded-full bg-light-blue px-4 py-2 text-sm text-white disabled:opacity-50'>
+                <div className='flex flex-wrap items-center gap-4'>
+                    {message && <p className={`text-[13.5px] ${message.ok ? 'text-good' : 'text-bad'}`}>{message.text}</p>}
+                    <button type='submit' disabled={isBusy} className={btn('primary', 'sm', 'ml-auto')}>
                         {isBusy ? 'Working...' : 'Create account'}
                     </button>
                 </div>
             </form>
 
+            <ul className='flex flex-col gap-2.5 md:hidden'>
+                {users.map((user) => {
+                    const isSelf = user._id === currentUserId
+                    return (
+                        <li key={user._id} className='card flex flex-col gap-3 p-5'>
+                            {person(user, isSelf)}
+                            <div className='flex items-center justify-between gap-3 text-[13px] text-ink-2'>
+                                {roleSelect(user, isSelf)}
+                                <span>{user.attempts} {user.attempts === 1 ? 'attempt' : 'attempts'}</span>
+                                {score(user)}
+                            </div>
+                            {userActions(user, isSelf)}
+                        </li>
+                    )
+                })}
+            </ul>
 
-            <div className='rounded-2xl border border-brand-secondary bg-white'>
-                <ul className='divide-y divide-gray-100 md:hidden'>
-                    {users.map((user) => {
-                        const isSelf = user._id === currentUserId
-                        return (
-                            <li key={user._id} className='flex flex-col gap-3 p-4'>
-                                <div className='min-w-0'>
-                                    <div className='font-medium'>{user.name}{isSelf && <span className='font-normal text-gray-500'> (you)</span>}</div>
-                                    <div className='truncate text-sm text-Secondary-Text'>{user.email}</div>
-                                    <div className='text-sm text-Secondary-Text'>{user.attempts} {user.attempts === 1 ? "attempt" : "attempts"} · Avg {average(user)}</div>
-                                </div>
-                                <div className='flex flex-wrap items-center gap-x-4 gap-y-2 text-sm'>
-                                    {roleSelect(user, isSelf)}
-                                    {userActions(user, isSelf)}
-                                </div>
-                            </li>
-                        )
-                    })}
-                </ul>
-
-                <table className='hidden w-full text-left text-sm md:table'>
-                    <thead className='border-b border-gray-100 text-Secondary-Text'>
-                        <tr>
-                            <th className='px-6 py-3 font-normal'>Name</th>
-                            <th className='px-3 py-3 font-normal'>Email</th>
-                            <th className='px-3 py-3 font-normal'>Role</th>
-                            <th className='px-3 py-3 font-normal'>Attempts</th>
-                            <th className='px-3 py-3 font-normal'>Avg score</th>
-                            <th className='px-6 py-3 font-normal'>Actions</th>
+            <div className='card hidden overflow-x-auto px-2 py-1.5 md:block'>
+                <table className='w-full min-w-[760px] text-left text-sm'>
+                    <thead>
+                        <tr className='text-[12.5px] text-ink-3'>
+                            <th className='border-b border-line px-4 py-3.5 font-medium'>Name</th>
+                            <th className='border-b border-line px-4 py-3.5 font-medium'>Role</th>
+                            <th className='border-b border-line px-4 py-3.5 font-medium'>Attempts</th>
+                            <th className='border-b border-line px-4 py-3.5 font-medium'>Avg score</th>
+                            <th className='border-b border-line px-4 py-3.5 text-right font-medium'>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.map((user) => {
                             const isSelf = user._id === currentUserId
                             return (
-                                <tr key={user._id} className='border-b border-gray-100 last:border-0'>
-                                    <td className='px-6 py-3'>{user.name}{isSelf && <span className='text-gray-500'> (you)</span>}</td>
-                                    <td className='px-3 py-3'>{user.email}</td>
-                                    <td className='px-3 py-3'>{roleSelect(user, isSelf)}</td>
-                                    <td className='px-3 py-3'>{user.attempts}</td>
-                                    <td className='px-3 py-3'>{average(user)}</td>
-                                    <td className='px-6 py-3'>{userActions(user, isSelf)}</td>
+                                <tr key={user._id} className='[&:last-child>td]:border-b-0'>
+                                    <td className='border-b border-line px-4 py-4'>{person(user, isSelf)}</td>
+                                    <td className='border-b border-line px-4 py-4'>{roleSelect(user, isSelf)}</td>
+                                    <td className='border-b border-line px-4 py-4 tabular-nums'>{user.attempts}</td>
+                                    <td className='border-b border-line px-4 py-4'>{score(user)}</td>
+                                    <td className='border-b border-line px-4 py-4'>{userActions(user, isSelf)}</td>
                                 </tr>
                             )
                         })}

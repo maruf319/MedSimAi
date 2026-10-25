@@ -10,7 +10,7 @@ export default async function page() {
 
   return (
     <PageContainer>
-      <PageHeader eyebrow='Admin' title='Announcements' description='Shown to students on the Announcements page, newest first.' />
+      <PageHeader title='Announcements' description='Shown to students newest first.' />
       <AnnouncementManager announcements={announcements} />
     </PageContainer>
   )

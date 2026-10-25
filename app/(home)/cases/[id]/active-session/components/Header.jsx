@@ -1,8 +1,9 @@
 'use client'
-import { ArrowLeft, Clock, NotebookPen, StopCircle } from 'lucide-react'
+import { ArrowLeft, NotebookPen, StopCircle } from 'lucide-react'
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
+import { btn } from '@/app/components/ui'
 
 function formatElapsed(totalSeconds) {
     const hours = Math.floor(totalSeconds / 3600);
@@ -66,37 +67,40 @@ export default function Header({ slug, title, attemptId, startedAt, onToggleNote
         }
     }
     return (
-        <div className='mx-auto flex w-full max-w-6xl flex-col gap-2'>
+        <div className='mx-auto flex w-full max-w-[1240px] flex-col gap-2'>
             <div className='flex flex-wrap items-center justify-between gap-3'>
-                <Link href={`/cases/${slug}`} className='flex min-w-0 items-center gap-2 font-medium hover:text-deep-blue'>
-                    <ArrowLeft className='h-5 w-5 shrink-0' />
-                    <span className='truncate'>{title}</span>
+                <Link href={`/cases/${slug}`} className='flex min-w-0 items-center gap-3'>
+                    <span className='grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface shadow-[inset_0_0_0_1px_var(--line)]'><ArrowLeft className='h-[18px] w-[18px]' /></span>
+                    <span className='flex min-w-0 flex-col'>
+                        <b className='truncate font-display text-[19px] font-bold tracking-[-0.02em]'>{title}</b>
+                        <span className='text-xs text-ink-3'>Live session</span>
+                    </span>
                 </Link>
 
                 <div className='flex items-center gap-2'>
-                    <div className='flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-sm tabular-nums text-Secondary-Text ring-1 ring-gray-200' aria-label='Session time'>
-                        <Clock className='h-4 w-4' />
+                    <div className='flex h-10 items-center gap-2.5 rounded-full bg-surface px-4 font-mono text-sm tabular-nums shadow-[inset_0_0_0_1px_var(--line)]' aria-label='Session time'>
+                        <span className='h-2 w-2 animate-pulse rounded-full bg-bad' aria-hidden />
                         {/* Server and browser clocks differ by a moment; the next tick corrects it */}
                         <span suppressHydrationWarning>{formatElapsed(elapsed)}</span>
                     </div>
                     <button
                         type='button'
                         onClick={onToggleNotes}
-                        className='flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-gray-200 hover:bg-gray-50 cursor-pointer lg:hidden'
+                        className={btn('ghost', 'sm', 'lg:hidden')}
                     >
-                        <NotebookPen className='h-4 w-4' /> Notes
+                        <NotebookPen aria-hidden /> Notes
                     </button>
                     <button
-                        className='flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60'
+                        className={btn('primary', 'md')}
                         onClick={handleSession}
                         disabled={isStopping}
                     >
-                        <StopCircle className='h-4 w-4' />
+                        <StopCircle aria-hidden />
                         {isStopping ? 'Ending and scoring...' : 'Stop session'}
                     </button>
                 </div>
             </div>
-            {error && <p className='text-right text-sm text-red-600'>{error}</p>}
+            {error && <p className='text-right text-[13.5px] text-bad'>{error}</p>}
         </div>
     )
 }

@@ -1,8 +1,8 @@
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
-import CaseCard from './CaseCard'
+import { Play } from 'lucide-react'
 import Section from './Section'
+import { btn, LinkButton } from '@/app/components/ui'
 
 function timeAgo(value) {
     const seconds = Math.round((new Date(value) - Date.now()) / 1000)
@@ -17,20 +17,21 @@ function timeAgo(value) {
 export default function ContinueSessions({ sessions, total }) {
     return (
         <Section
-            eyebrow='In progress'
             title='Continue where you left off'
-            action={total > sessions.length &&
-                <Link href='/attempts' className='flex items-center gap-1 text-sm font-medium text-light-blue hover:text-primary-dark'>View all <ArrowRight className='h-4 w-4' /></Link>}
+            action={total > sessions.length && <LinkButton href='/attempts' variant='ghost' size='sm'>View all</LinkButton>}
         >
-            {sessions.map((s) =>
-                <CaseCard
-                    key={s.attemptId}
-                    href={`/cases/${s.slug}/active-session?attempt=${s.attemptId}`}
-                    title={s.title}
-                    type={s.specialty}
-                    meta={`Attempt ${s.attemptNumber} · ${timeAgo(s.startedAt)}`}
-                    result='Resume'
-                />)}
+            <ul className='flex flex-col'>
+                {sessions.map((s) =>
+                    <li key={s.attemptId} className='flex items-center gap-4 border-t border-line py-4 first:border-t-0 first:pt-1 last:pb-0'>
+                        <span className='flex min-w-0 flex-1 flex-col'>
+                            <span className='truncate text-[15px] font-semibold'>{s.title}</span>
+                            <span className='text-[13px] text-ink-3'>Attempt {s.attemptNumber} · started {timeAgo(s.startedAt)}</span>
+                        </span>
+                        <Link href={`/cases/${s.slug}/active-session?attempt=${s.attemptId}`} className={btn('primary', 'sm')}>
+                            <Play aria-hidden /> Resume
+                        </Link>
+                    </li>)}
+            </ul>
         </Section>
     )
 }

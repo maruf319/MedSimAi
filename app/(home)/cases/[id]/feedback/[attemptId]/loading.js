@@ -9,10 +9,10 @@ export default function Loading() {
                 <Bone className='h-8 w-56' />
                 <Bone className='h-4 w-36' />
             </div>
-            <div className='grid grid-cols-2 gap-1 rounded-2xl border border-brand-secondary bg-white p-1 sm:grid-cols-4'>
+            <div className='grid grid-cols-2 gap-1 rounded-2xl card p-1 sm:grid-cols-4'>
                 {[0, 1, 2, 3].map((i) => <Bone key={i} className='h-10 rounded-xl' />)}
             </div>
-            <div className='flex flex-col gap-6 rounded-3xl border border-brand-secondary bg-gray-50 p-5 sm:p-8 lg:flex-row lg:items-center lg:gap-10'>
+            <div className='flex flex-col gap-6 rounded-3xl hero p-5 sm:p-8 lg:flex-row lg:items-center lg:gap-10'>
                 <div className='flex flex-col items-center gap-5 sm:flex-row lg:flex-1'>
                     <Bone className='h-36 w-36 shrink-0 rounded-full sm:h-40 sm:w-40' />
                     <div className='flex w-full flex-col gap-3'>
@@ -27,8 +27,8 @@ export default function Loading() {
                 </div>
             </div>
             {[0, 1, 2].map((i) =>
-                <div key={i} className='overflow-hidden rounded-2xl border border-brand-secondary bg-white'>
-                    <div className='flex items-center gap-3 border-b border-brand-secondary px-4 py-4 sm:px-6'>
+                <div key={i} className='overflow-hidden rounded-2xl card'>
+                    <div className='flex items-center gap-3 border-b border-line px-4 py-4 sm:px-6'>
                         <Bone className='h-11 w-11 rounded-xl' />
                         <div className='flex flex-col gap-2'>
                             <Bone className='h-5 w-36' />

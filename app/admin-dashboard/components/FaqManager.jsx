@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react'
 import { deleteFaq, moveFaq, saveFaq } from '@/app/actions/adminContent'
+import { btn, fieldArea, fieldInput } from '@/app/components/ui'
 
-const inputClass = 'w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-light-blue'
 const emptyForm = { question: '', answer: '' }
+const moveBtn = 'grid h-[22px] w-7 cursor-pointer place-items-center rounded-lg text-ink-3 hover:bg-surface-2 hover:text-ink disabled:cursor-default disabled:opacity-30'
 
 export default function FaqManager({ faqs }) {
     const router = useRouter()
@@ -19,6 +20,7 @@ export default function FaqManager({ faqs }) {
         setEditingId(faq._id)
         setForm({ question: faq.question, answer: faq.answer })
         setError('')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     function reset() {
@@ -42,19 +44,25 @@ export default function FaqManager({ faqs }) {
     }
 
     return (
-        <div className='flex flex-col gap-6'>
+        <div className='flex flex-col gap-4'>
             <form
                 onSubmit={(e) => { e.preventDefault(); run(() => saveFaq(editingId, form), reset) }}
-                className='flex flex-col gap-4 rounded-2xl border border-brand-secondary bg-white p-4 sm:p-6'
+                className='card tint flex flex-col gap-4 p-5 sm:p-[26px]'
             >
-                <div className='font-medium text-deep-blue'>{editingId ? 'Edit question' : 'New question'}</div>
-                <input value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} placeholder='Question' required className={inputClass} />
-                <textarea value={form.answer} onChange={(e) => setForm({ ...form, answer: e.target.value })} placeholder='Answer' rows={3} required className={inputClass} />
+                <h2 className='text-[22px] font-bold'>{editingId ? 'Edit question' : 'New question'}</h2>
+                <label className='flex flex-col gap-[7px] text-[13px] font-semibold'>
+                    Question
+                    <input value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} placeholder='Write it the way a student would ask' required className={`${fieldInput} font-normal`} />
+                </label>
+                <label className='flex flex-col gap-[7px] text-[13px] font-semibold'>
+                    Answer
+                    <textarea value={form.answer} onChange={(e) => setForm({ ...form, answer: e.target.value })} rows={3} required className={`${fieldArea} font-normal`} />
+                </label>
                 <div className='flex flex-wrap items-center gap-4'>
-                    {error && <p className='text-sm text-red-600'>{error}</p>}
+                    {error && <p className='text-[13.5px] text-bad'>{error}</p>}
                     <div className='ml-auto flex gap-2'>
-                        {editingId && <button type='button' onClick={reset} className='rounded-lg border border-gray-300 px-4 py-2 text-sm'>Cancel</button>}
-                        <button type='submit' disabled={isBusy} className='rounded-full bg-light-blue px-4 py-2 text-sm text-white disabled:opacity-50'>
+                        {editingId && <button type='button' onClick={reset} className={btn('ghost', 'sm')}>Cancel</button>}
+                        <button type='submit' disabled={isBusy} className={btn('primary', 'sm')}>
                             {isBusy ? 'Saving...' : editingId ? 'Save changes' : 'Add question'}
                         </button>
                     </div>
@@ -62,40 +70,33 @@ export default function FaqManager({ faqs }) {
             </form>
 
             {faqs.length === 0
-                ? <div className='text-Secondary-Text'>No questions yet.</div>
-                : <div className='flex flex-col gap-3'>
+                ? <div className='card p-6 text-ink-2'>No questions yet.</div>
+                : <div className='flex flex-col gap-2.5'>
                     {faqs.map((faq, index) =>
-                        <div key={faq._id} className='flex items-start gap-3 rounded-2xl border border-brand-secondary bg-white p-4'>
-                            <div className='flex flex-col gap-1'>
-                                <button
-                                    onClick={() => run(() => moveFaq(faq._id, -1))}
-                                    disabled={isBusy || index === 0}
-                                    aria-label='Move up'
-                                    className='rounded p-1 hover:bg-gray-100 cursor-pointer disabled:opacity-30'
-                                >
-                                    <ArrowUp size={16} />
+                        <div key={faq._id} className='card grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3.5 px-5 py-[18px] sm:grid-cols-[auto_40px_minmax(0,1fr)_auto] sm:px-6'>
+                            <div className='flex flex-col gap-0.5'>
+                                <button type='button' onClick={() => run(() => moveFaq(faq._id, -1))} disabled={isBusy || index === 0} aria-label='Move up' className={moveBtn}>
+                                    <ChevronUp className='h-3.5 w-3.5' />
                                 </button>
-                                <button
-                                    onClick={() => run(() => moveFaq(faq._id, 1))}
-                                    disabled={isBusy || index === faqs.length - 1}
-                                    aria-label='Move down'
-                                    className='rounded p-1 hover:bg-gray-100 cursor-pointer disabled:opacity-30'
-                                >
-                                    <ArrowDown size={16} />
+                                <button type='button' onClick={() => run(() => moveFaq(faq._id, 1))} disabled={isBusy || index === faqs.length - 1} aria-label='Move down' className={moveBtn}>
+                                    <ChevronDown className='h-3.5 w-3.5' />
                                 </button>
                             </div>
-                            <div className='flex-1'>
-                                <div className='font-semibold'>{faq.question}</div>
-                                <div className='text-sm text-gray-600'>{faq.answer}</div>
+                            <span className='num hidden pt-0.5 text-[26px] tracking-[-0.03em] text-ink-3 sm:block'>{String(index + 1).padStart(2, '0')}</span>
+                            <div className='flex min-w-0 flex-col gap-1.5'>
+                                <h3 className='text-[17px] font-bold'>{faq.question}</h3>
+                                <p className='text-sm text-ink-2'>{faq.answer}</p>
                             </div>
-                            <div className='flex gap-3 text-sm'>
-                                <button onClick={() => startEdit(faq)} className='text-light-blue hover:underline cursor-pointer'>Edit</button>
+                            <div className='col-span-2 flex items-center gap-1.5 sm:col-span-1'>
+                                <button type='button' onClick={() => startEdit(faq)} className={btn('ghost', 'sm')}><Pencil aria-hidden /> Edit</button>
                                 <button
+                                    type='button'
                                     onClick={() => confirm('Delete this question?') && run(() => deleteFaq(faq._id), () => editingId === faq._id && reset())}
                                     disabled={isBusy}
-                                    className='text-red-600 hover:underline cursor-pointer disabled:opacity-50'
+                                    aria-label='Delete question'
+                                    className='grid h-[34px] w-[34px] cursor-pointer place-items-center rounded-full bg-surface shadow-[inset_0_0_0_1px_var(--line)] hover:text-bad disabled:opacity-50'
                                 >
-                                    Delete
+                                    <Trash2 className='h-4 w-4' aria-hidden />
                                 </button>
                             </div>
                         </div>

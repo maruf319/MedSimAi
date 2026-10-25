@@ -1,13 +1,13 @@
 import React from 'react'
 
 export function Bone({ className = '' }) {
-    const background = /(^|\s)bg-/.test(className) ? '' : 'bg-brand-primary'
+    const background = /(^|\s)bg-/.test(className) ? '' : 'bg-surface-3'
     return <div aria-hidden className={`animate-pulse rounded-lg ${background} motion-reduce:animate-none ${className}`} />
 }
 
 export function SkeletonPage({ children, label = 'Loading', className = '' }) {
     return (
-        <div role='status' aria-live='polite' className={`mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-10 ${className}`}>
+        <div role='status' aria-live='polite' className={`mx-auto flex w-full max-w-[1240px] flex-col gap-[22px] px-4 pb-28 pt-6 sm:px-6 lg:px-7 lg:pb-16 lg:pt-7 ${className}`}>
             <span className='sr-only'>{label}…</span>
             {children}
         </div>
@@ -31,12 +31,12 @@ export function SkeletonHeader({ withIcon = true, withAction = false }) {
 }
 
 export function SkeletonCard({ children, className = '' }) {
-    return <div className={`rounded-2xl border border-brand-secondary bg-white p-5 sm:p-6 ${className}`}>{children}</div>
+    return <div className={`card p-5 sm:p-[26px] ${className}`}>{children}</div>
 }
 
 export function SkeletonRow({ withPill = true }) {
     return (
-        <div className='flex items-center gap-4 rounded-xl border border-brand-secondary bg-white p-4'>
+        <div className='card flex items-center gap-4 p-4'>
             <Bone className='h-11 w-11 shrink-0 rounded-xl' />
             <div className='flex flex-1 flex-col gap-2'>
                 <Bone className='h-4 w-2/3 max-w-xs' />

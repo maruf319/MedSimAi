@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Pencil, Trash2 } from 'lucide-react'
 import { deleteAnnouncement, saveAnnouncement } from '@/app/actions/adminContent'
+import { btn, fieldArea, fieldInput } from '@/app/components/ui'
+import { AnnouncementRow } from '@/app/(home)/announcements/components/Announcements'
 
-const inputClass = 'w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-light-blue'
 const emptyForm = { title: '', description: '', type: 'Update', isPublished: true }
 
 export default function AnnouncementManager({ announcements }) {
@@ -18,6 +20,7 @@ export default function AnnouncementManager({ announcements }) {
         setEditingId(a._id)
         setForm({ title: a.title, description: a.description, type: a.type, isPublished: a.isPublished })
         setError('')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     function reset() {
@@ -46,26 +49,35 @@ export default function AnnouncementManager({ announcements }) {
     }))
 
     return (
-        <div className='flex flex-col gap-6'>
+        <div className='flex flex-col gap-4'>
             <form
                 onSubmit={(e) => { e.preventDefault(); run(() => saveAnnouncement(editingId, form), reset) }}
-                className='flex flex-col gap-4 rounded-2xl border border-brand-secondary bg-white p-4 sm:p-6'
+                className='card tint flex flex-col gap-4 p-5 sm:p-[26px]'
             >
-                <div className='font-medium text-deep-blue'>{editingId ? 'Edit announcement' : 'New announcement'}</div>
+                <h2 className='text-[22px] font-bold'>{editingId ? 'Edit announcement' : 'New announcement'}</h2>
                 <div className='grid gap-4 md:grid-cols-3'>
-                    <input value={form.title} onChange={set('title')} placeholder='Title' required className={`${inputClass} md:col-span-2`} />
-                    <input value={form.type} onChange={set('type')} placeholder='Label, e.g. New Cases' className={inputClass} />
+                    <label className='flex flex-col gap-[7px] text-[13px] font-semibold md:col-span-2'>
+                        Title
+                        <input value={form.title} onChange={set('title')} placeholder='What’s the news?' required className={`${fieldInput} font-normal`} />
+                    </label>
+                    <label className='flex flex-col gap-[7px] text-[13px] font-semibold'>
+                        Label
+                        <input value={form.type} onChange={set('type')} placeholder='e.g. New Cases' className={`${fieldInput} font-normal`} />
+                    </label>
                 </div>
-                <textarea value={form.description} onChange={set('description')} placeholder='Message' rows={3} required className={inputClass} />
+                <label className='flex flex-col gap-[7px] text-[13px] font-semibold'>
+                    Message
+                    <textarea value={form.description} onChange={set('description')} rows={3} required className={`${fieldArea} font-normal`} />
+                </label>
                 <div className='flex flex-wrap items-center gap-4'>
-                    <label className='flex items-center gap-2 text-sm'>
-                        <input type='checkbox' checked={form.isPublished} onChange={set('isPublished')} className='h-4 w-4' />
+                    <label className='flex cursor-pointer items-center gap-2.5 text-sm'>
+                        <input type='checkbox' checked={form.isPublished} onChange={set('isPublished')} className='h-4 w-4 accent-[var(--accent)]' />
                         Visible to students
                     </label>
-                    {error && <p className='text-sm text-red-600'>{error}</p>}
+                    {error && <p className='text-[13.5px] text-bad'>{error}</p>}
                     <div className='ml-auto flex gap-2'>
-                        {editingId && <button type='button' onClick={reset} className='rounded-lg border border-gray-300 px-4 py-2 text-sm'>Cancel</button>}
-                        <button type='submit' disabled={isBusy} className='rounded-full bg-light-blue px-4 py-2 text-sm text-white disabled:opacity-50'>
+                        {editingId && <button type='button' onClick={reset} className={btn('ghost', 'sm')}>Cancel</button>}
+                        <button type='submit' disabled={isBusy} className={btn('primary', 'sm')}>
                             {isBusy ? 'Saving...' : editingId ? 'Save changes' : 'Publish announcement'}
                         </button>
                     </div>
@@ -73,30 +85,23 @@ export default function AnnouncementManager({ announcements }) {
             </form>
 
             {announcements.length === 0
-                ? <div className='text-Secondary-Text'>No announcements yet.</div>
-                : <div className='flex flex-col gap-3'>
+                ? <div className='card p-6 text-ink-2'>No announcements yet.</div>
+                : <div className='flex flex-col gap-2.5'>
                     {announcements.map((a) =>
-                        <div key={a._id} className='flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-brand-secondary bg-white p-4'>
-                            <div className='flex-1'>
-                                <div className='flex items-center gap-2'>
-                                    <span className='rounded-full bg-light-blue/10 px-3 py-1 text-xs text-light-blue'>{a.type}</span>
-                                    {!a.isPublished && <span className='rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600'>Hidden</span>}
-                                    <span className='text-xs text-gray-500'>{new Date(a.publishedAt).toLocaleDateString()}</span>
-                                </div>
-                                <div className='mt-2 font-semibold'>{a.title}</div>
-                                <div className='text-sm text-gray-600'>{a.description}</div>
-                            </div>
-                            <div className='flex gap-3 text-sm'>
-                                <button onClick={() => startEdit(a)} className='text-light-blue hover:underline cursor-pointer'>Edit</button>
+                        <AnnouncementRow key={a._id} announcement={a}>
+                            <div className='flex items-center gap-1.5'>
+                                <button type='button' onClick={() => startEdit(a)} className={btn('ghost', 'sm')}><Pencil aria-hidden /> Edit</button>
                                 <button
+                                    type='button'
                                     onClick={() => confirm(`Delete "${a.title}"?`) && run(() => deleteAnnouncement(a._id), () => editingId === a._id && reset())}
                                     disabled={isBusy}
-                                    className='text-red-600 hover:underline cursor-pointer disabled:opacity-50'
+                                    aria-label={`Delete ${a.title}`}
+                                    className='grid h-[34px] w-[34px] cursor-pointer place-items-center rounded-full bg-surface shadow-[inset_0_0_0_1px_var(--line)] hover:text-bad disabled:opacity-50'
                                 >
-                                    Delete
+                                    <Trash2 className='h-4 w-4' aria-hidden />
                                 </button>
                             </div>
-                        </div>
+                        </AnnouncementRow>
                     )}
                 </div>}
         </div>

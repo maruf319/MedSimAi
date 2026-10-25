@@ -1,55 +1,52 @@
 'use client'
-import { Menu, X } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Logo, NavContent } from './Sidebar'
+import { getMenu, isActive } from './navigation'
+import NavIcon from './NavIcon'
+import Logo from './Logo'
+import AccountMenu from './AccountMenu'
+import ThemeToggle from './ThemeToggle'
 
+/** Phone and small tablet: floating top bar plus a floating tab bar at the bottom. */
 export default function MobileNav(props) {
+    const { variant = 'student', isAdmin = false } = props
     const pathname = usePathname()
-    const [openedOn, setOpenedOn] = useState(null)
-    const open = openedOn === pathname
-    const setOpen = (value) => setOpenedOn(value ? pathname : null)
-
-    useEffect(() => {
-        if (!open) return
-        const onKey = (e) => e.key === 'Escape' && setOpenedOn(null)
-        window.addEventListener('keydown', onKey)
-        return () => window.removeEventListener('keydown', onKey)
-    }, [open])
+    const menu = getMenu(variant, isAdmin)
+    const tabs = menu.filter((m) => !m.secondary)
+    const extraLinks = menu.filter((m) => m.secondary)
 
     return (
         <div className='lg:hidden'>
-            <header className='nav-gradient flex h-14 items-center justify-between px-4'>
-                <Logo href={props.variant === 'admin' ? '/admin-dashboard' : '/dashboard'} />
-                <button
-                    type='button'
-                    onClick={() => setOpen(true)}
-                    aria-label='Open menu'
-                    aria-expanded={open}
-                    className='rounded-lg p-2 text-white hover:bg-white/10 cursor-pointer'
-                >
-                    <Menu className='h-6 w-6' />
-                </button>
-            </header>
+            <div className='px-3 pt-3'>
+                <header className='frost flex items-center justify-between gap-3 rounded-full py-[7px] pl-4 pr-[7px]'>
+                    <Logo href={variant === 'admin' ? '/admin-dashboard' : '/dashboard'} tag={variant === 'admin' ? 'Admin' : null} />
+                    <span className='flex items-center gap-1.5'>
+                        <AccountMenu {...props} extraLinks={extraLinks} placement='top' compact />
+                        <ThemeToggle className='h-11 w-11 !rounded-full' />
+                    </span>
+                </header>
+            </div>
 
-            {open &&
-                <div className='fixed inset-0 z-50' role='dialog' aria-modal='true' aria-label='Menu'>
-                    <div className='absolute inset-0 bg-black/40' onClick={() => setOpen(false)} />
-                    <div className='nav-gradient absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col shadow-xl'>
-                        <div className='flex items-center justify-between px-4 py-4'>
-                            <Logo href={props.variant === 'admin' ? '/admin-dashboard' : '/dashboard'} />
-                            <button
-                                type='button'
-                                onClick={() => setOpen(false)}
-                                aria-label='Close menu'
-                                className='rounded-lg p-2 text-white hover:bg-white/10 cursor-pointer'
-                            >
-                                <X className='h-6 w-6' />
-                            </button>
-                        </div>
-                        <NavContent {...props} onNavigate={() => setOpen(false)} />
-                    </div>
-                </div>}
+            <nav
+                aria-label='Main'
+                className='frost fixed inset-x-3 bottom-[calc(12px+env(safe-area-inset-bottom,0px))] z-40 grid auto-cols-fr grid-flow-col rounded-full p-1.5'
+            >
+                {tabs.map((item) => {
+                    const active = isActive(pathname, item)
+                    return (
+                        <Link
+                            key={item.link}
+                            href={item.link}
+                            aria-current={active ? 'page' : undefined}
+                            className={`flex h-[54px] flex-col items-center justify-center gap-[3px] rounded-full text-[10.5px] font-medium ${active ? 'bg-grad text-on-hero' : 'text-ink-3'}`}
+                        >
+                            <NavIcon name={item.icon} active={active} className='h-[21px] w-[21px]' />
+                            <span>{item.short ?? item.title}</span>
+                        </Link>
+                    )
+                })}
+            </nav>
         </div>
     )
 }

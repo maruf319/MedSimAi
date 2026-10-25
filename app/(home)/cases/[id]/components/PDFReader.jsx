@@ -36,17 +36,17 @@ export default function PDFReader({ file }) {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+    <div className="card flex h-full flex-col overflow-hidden">
 
-      <div className="flex shrink-0 items-center justify-between border-b bg-white px-4 py-3">
+      <div className="flex shrink-0 items-center justify-between border-b border-line px-5 py-4">
 
-        <div className="text-sm font-medium text-gray-700">
+        <div className="font-display text-[17px] font-bold">
           Case Document
         </div>
 
-        <div className="flex items-center gap-3 text-sm text-gray-500">
+        <div className="flex items-center gap-3 text-[13px] text-ink-3">
           {numPages ? `${numPages} ${numPages === 1 ? 'page' : 'pages'}` : 'Loading...'}
-          <a href={file} target="_blank" rel="noopener noreferrer" className="text-light-blue hover:underline">
+          <a href={file} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center rounded-full bg-surface px-[15px] text-[13px] font-semibold text-ink shadow-[0_0_0_1px_var(--line)] hover:bg-surface-2">
             Open
           </a>
         </div>
@@ -56,7 +56,7 @@ export default function PDFReader({ file }) {
 
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto p-6"
+        className="flex-1 overflow-y-auto bg-surface-2 p-6"
       >
 
         <Document
@@ -64,13 +64,13 @@ export default function PDFReader({ file }) {
           onLoadSuccess={onDocumentLoadSuccess}
 
           loading={
-            <div className="flex h-40 items-center justify-center text-sm text-gray-500">
+            <div className="flex h-40 items-center justify-center text-sm text-ink-3">
               Loading PDF...
             </div>
           }
 
           error={
-            <div className="flex h-40 items-center justify-center text-sm text-red-500">
+            <div className="flex h-40 items-center justify-center text-sm text-bad">
               Failed to load PDF.
             </div>
           }
@@ -80,7 +80,7 @@ export default function PDFReader({ file }) {
             Array.from({ length: numPages }, (val, index) => (
               <div
                 key={index}
-                className="mb-6 flex justify-center"
+                className="mb-6 flex justify-center overflow-hidden rounded-xl"
               >
                 {pageWidth && (
                   <Page

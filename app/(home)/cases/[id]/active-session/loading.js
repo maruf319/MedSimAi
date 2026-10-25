@@ -20,8 +20,8 @@ export default function Loading() {
             </div>
 
             <div className='mx-auto flex min-h-0 w-full max-w-6xl flex-1 gap-4'>
-                <div className='flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-brand-secondary bg-white'>
-                    <div className='flex items-center gap-3 border-b border-brand-secondary px-4 py-3'>
+                <div className='flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl card'>
+                    <div className='flex items-center gap-3 border-b border-line px-4 py-3'>
                         <Bone className='h-10 w-10 rounded-full' />
                         <div className='flex flex-col gap-2'>
                             <Bone className='h-4 w-36' />
@@ -34,14 +34,14 @@ export default function Loading() {
                                 <Bone className={`h-14 rounded-2xl ${b.width}`} />
                             </div>)}
                     </div>
-                    <div className='border-t border-brand-secondary p-3 sm:p-4'>
+                    <div className='border-t border-line p-3 sm:p-4'>
                         <div className='flex gap-2'>
                             <Bone className='h-12 flex-1 rounded-xl' />
                             <Bone className='h-12 w-12 rounded-xl' />
                         </div>
                     </div>
                 </div>
-                <div className='hidden w-80 shrink-0 flex-col gap-3 rounded-2xl border border-brand-secondary bg-white p-4 lg:flex'>
+                <div className='hidden w-80 shrink-0 flex-col gap-3 rounded-2xl card p-4 lg:flex'>
                     <Bone className='h-9 w-full rounded-full' />
                     <Bone className='flex-1 rounded-lg' />
                 </div>

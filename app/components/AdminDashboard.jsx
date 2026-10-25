@@ -1,70 +1,90 @@
 import React from 'react'
 import Link from 'next/link'
-import { ChevronRight, Plus } from 'lucide-react'
-import { GlassStats, HeroBanner, PageContainer } from './PageHeader'
-import SpecialtyIcon from './SpecialtyIcon'
+import { Pencil, Plus } from 'lucide-react'
+import PageHeader, { PageContainer } from './PageHeader'
+import ScoreCurve from './ScoreCurve'
+import { Chip, LinkButton, Meter } from './ui'
+
+const MAX_CHART_CASES = 8
 
 export default function Dashboard({ overview }) {
-    const stats = [
-        { value: overview.totalStudents, label: 'Enrolled students' },
-        { value: overview.studentsCompleted, label: 'Completed a case' },
-        { value: overview.averageScore === null ? '–' : `${overview.averageScore}%`, label: 'Average score' },
-        { value: overview.studentsAtRisk, label: `At risk (avg < ${overview.atRiskThreshold}%)` },
-    ]
+    const scored = overview.cases.filter((c) => c.averageScore !== null).slice(0, MAX_CHART_CASES)
+    const unscored = overview.cases.filter((c) => c.averageScore === null).length
+    const atRisk = overview.studentsAtRisk
 
     return (
         <PageContainer>
-            <HeroBanner>
-                <div className='flex flex-col gap-8 p-6 sm:p-10'>
-                    <div className='flex flex-wrap items-end justify-between gap-6'>
-                        <div className='max-w-xl'>
-                            <div className='text-sm font-medium text-white/80'>Admin overview</div>
-                            <h1 className='mt-2 text-3xl font-bold leading-tight text-white sm:text-4xl'>Your case library</h1>
-                            <p className='mt-3 text-white/85'>
-                                {overview.cases.length} {overview.cases.length === 1 ? 'case' : 'cases'}, with live progress from your students.
-                            </p>
-                        </div>
-                        <Link href={'/admin-dashboard/create-new-case'} className='inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-light-blue shadow-sm hover:bg-brand-primary'>
-                            <Plus className='h-4 w-4' /> New case
-                        </Link>
-                    </div>
-                    <GlassStats stats={stats} />
-                </div>
-            </HeroBanner>
+            <PageHeader
+                title='Overview'
+                description={`${overview.cases.length} ${overview.cases.length === 1 ? 'case' : 'cases'} · live progress from your students`}
+                actions={<LinkButton href='/admin-dashboard/create-new-case'><Plus aria-hidden /> New case</LinkButton>}
+            />
 
-            <section className='rounded-2xl border border-brand-secondary bg-white'>
-                <div className='flex items-end justify-between border-b border-brand-secondary px-5 py-4 sm:px-6'>
-                    <div>
-                        <div className='eyebrow'>Cases</div>
-                        <h2 className='mt-0.5 text-xl font-bold'>Student progress by case</h2>
+            <div className='grid gap-4 lg:grid-cols-12'>
+                <section className='hero flex flex-col gap-[26px] p-6 sm:p-8 lg:col-span-8'>
+                    <div className='flex flex-wrap items-start justify-between gap-4'>
+                        <div className='flex flex-col gap-2.5'>
+                            <span className='text-[13px] font-medium text-on-hero-2'>Average score</span>
+                            <span className='num text-[64px] sm:text-[92px]'>
+                                {overview.averageScore === null ? '–' : <>{overview.averageScore}<small className='ml-1 text-[0.36em] font-semibold opacity-60'>%</small></>}
+                            </span>
+                        </div>
+                        <Chip tone='glass' dot>{atRisk === 0 ? 'No students at risk' : `${atRisk} ${atRisk === 1 ? 'student' : 'students'} at risk`}</Chip>
                     </div>
-                    <Link href='/admin-dashboard/cases' className='text-sm font-medium text-light-blue hover:text-primary-dark'>Manage cases</Link>
+                    {scored.length > 0
+                        ? <div className='flex flex-col gap-1.5'>
+                            <span className='text-[13px] font-medium text-on-hero-2'>Average score by case</span>
+                            <ScoreCurve id='admin-cases' labels={scored.map((c) => c.title)} values={scored.map((c) => c.averageScore)} />
+                        </div>
+                        : <p className='text-on-hero-2'>Scores appear here once students complete cases.</p>}
+                    {unscored > 0 && scored.length > 0 &&
+                        <span className='text-[12.5px] text-on-hero-3'>{unscored} {unscored === 1 ? 'case has' : 'cases have'} no scores yet</span>}
+                </section>
+
+                <div className='grid gap-4 sm:grid-cols-3 lg:col-span-4 lg:grid-cols-1'>
+                    <section className='card flex flex-col justify-between gap-[18px] p-[22px]'>
+                        <span className='text-[13px] font-medium text-ink-2'>Enrolled students</span>
+                        <span className='num text-[48px]'>{overview.totalStudents}</span>
+                    </section>
+                    <section className='card flex flex-col justify-between gap-[18px] p-[22px]'>
+                        <span className='text-[13px] font-medium text-ink-2'>Completed a case</span>
+                        <span className='num text-[48px]'>{overview.studentsCompleted}<small className='ml-1 text-[0.36em] font-semibold opacity-60'>/{overview.totalStudents}</small></span>
+                    </section>
+                    <section className='card tint flex flex-col justify-between gap-[18px] p-[22px]'>
+                        <span className='text-[13px] font-medium text-ink-2'>At risk · average under {overview.atRiskThreshold}%</span>
+                        <span className='num text-[48px]'>{atRisk}</span>
+                    </section>
+                </div>
+            </div>
+
+            <section className='card p-5 sm:p-[26px]'>
+                <div className='mb-[18px] flex items-center justify-between gap-4'>
+                    <h2 className='text-[22px] font-bold'>Progress by case</h2>
+                    <LinkButton href='/admin-dashboard/cases' variant='ghost' size='sm'>Manage cases</LinkButton>
                 </div>
                 {overview.cases.length === 0
-                    ? <div className='p-6 text-Secondary-Text'>No cases yet. Create one to get started.</div>
-                    : <ul className='divide-y divide-brand-secondary'>
+                    ? <p className='text-ink-2'>No cases yet. Create one to get started.</p>
+                    : <ul>
                         {overview.cases.map((c) =>
-                            <li key={c._id}>
-                                <Link href={`/admin-dashboard/cases/${c._id}/edit`} className='group flex items-center gap-4 px-5 py-4 hover:bg-brand-primary/60 sm:px-6'>
-                                    <SpecialtyIcon specialty={c.specialty} className='h-11 w-11 shrink-0 rounded-xl bg-brand-primary p-2.5 text-light-blue' />
-                                    <div className='flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:justify-between'>
-                                        <div className='min-w-0'>
-                                            <div className='font-semibold'>{c.title}</div>
-                                            <div className='text-sm text-Secondary-Text'>
-                                                {[c.specialty, c.difficulty, c.duration].filter(Boolean).join(' · ')}
-                                            </div>
-                                        </div>
-                                        <div className='flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-Secondary-Text'>
-                                            <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${c.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                                                {c.isPublished ? 'Published' : 'Draft'}
-                                            </span>
-                                            <span>{c.attempts} {c.attempts === 1 ? 'attempt' : 'attempts'}</span>
-                                            <span>{c.completions} completed</span>
-                                            <span>Avg {c.averageScore === null ? '–' : `${c.averageScore}%`}</span>
-                                        </div>
-                                    </div>
-                                    <ChevronRight className='h-5 w-5 shrink-0 text-gray-400 group-hover:text-light-blue' />
-                                </Link>
+                            <li key={c._id} className='grid grid-cols-[minmax(0,1fr)_auto] items-center gap-5 border-t border-line py-4 first:border-t-0 first:pt-1 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_60px_auto]'>
+                                <span className='flex min-w-0 flex-col gap-0.5'>
+                                    <span className='truncate font-semibold'>{c.title}</span>
+                                    <span className='truncate text-[12.5px] text-ink-3'>{[c.specialty, c.difficulty, c.duration].filter(Boolean).join(' · ')}</span>
+                                </span>
+                                <span className='hidden flex-col gap-2 text-[12.5px] text-ink-2 sm:flex'>
+                                    <Meter value={c.attempts ? (c.completions / c.attempts) * 100 : 0} n={20} size='sm' />
+                                    <span>{c.completions} of {c.attempts} {c.attempts === 1 ? 'attempt' : 'attempts'} completed</span>
+                                </span>
+                                <span className='hidden flex-col gap-0.5 sm:flex'>
+                                    <span className='text-xs text-ink-3'>Avg</span>
+                                    <b className='tabular-nums'>{c.averageScore === null ? '–' : `${c.averageScore}%`}</b>
+                                </span>
+                                <span className='flex items-center gap-2'>
+                                    <Chip tone={c.isPublished ? 'good' : 'neutral'} dot>{c.isPublished ? 'Published' : 'Draft'}</Chip>
+                                    <Link href={`/admin-dashboard/cases/${c._id}/edit`} aria-label={`Edit ${c.title}`} className='grid h-[34px] w-[34px] place-items-center rounded-full bg-surface shadow-[inset_0_0_0_1px_var(--line)] hover:bg-surface-2'>
+                                        <Pencil className='h-4 w-4' aria-hidden />
+                                    </Link>
+                                </span>
                             </li>)}
                     </ul>}
             </section>

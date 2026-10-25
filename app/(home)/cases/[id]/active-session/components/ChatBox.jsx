@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Send, Mic } from 'lucide-react'
+import { ArrowUp } from 'lucide-react'
 
 export default function ChatBox({ attemptId, initialMessages = [] }) {
 
@@ -89,9 +89,9 @@ export default function ChatBox({ attemptId, initialMessages = [] }) {
                         >
 
                             <div
-                                className={`max-w-[85%] rounded-2xl px-4 py-3 sm:max-w-[75%] text-sm leading-6 ${message.role === 'student'
-                                    ? 'rounded-br-sm bg-light-blue text-white'
-                                    : 'rounded-bl-sm bg-gray-100 text-gray-800'
+                                className={`max-w-[85%] rounded-[20px] px-4 py-3 text-[14.5px] leading-6 sm:max-w-[75%] ${message.role === 'student'
+                                    ? 'rounded-br-md bg-grad text-on-hero'
+                                    : 'rounded-bl-md bg-surface-2'
                                     }`}
                             >
                                 {message.content}
@@ -103,7 +103,7 @@ export default function ChatBox({ attemptId, initialMessages = [] }) {
 
                     {isSending && (
                         <div className="flex justify-start">
-                            <div className="rounded-2xl rounded-bl-sm bg-gray-100 px-4 py-3 text-sm italic text-gray-500">
+                            <div className="rounded-[20px] rounded-bl-md bg-surface-2 px-4 py-3 text-sm italic text-ink-3">
                                 Patient is typing...
                             </div>
                         </div>
@@ -115,48 +115,39 @@ export default function ChatBox({ attemptId, initialMessages = [] }) {
 
             </div>
 
-            <div className="shrink-0 border-t border-gray-200 p-3 sm:p-4">
+            <div className="shrink-0 px-3 pb-3 sm:px-4 sm:pb-4">
 
                 {error && (
-                    <p className="mx-auto mb-2 max-w-3xl text-sm text-red-600">
+                    <p className="mx-auto mb-2 max-w-3xl text-[13.5px] text-bad">
                         {error}
                     </p>
                 )}
 
                 <form
                     onSubmit={handleSubmit}
-                    className="mx-auto flex max-w-3xl items-center gap-2"
+                    className="mx-auto flex max-w-3xl items-center gap-2 rounded-full bg-[linear-gradient(180deg,var(--surface-2),var(--accent-soft))] py-1.5 pl-[22px] pr-1.5 shadow-[inset_0_0_0_1px_var(--line)]"
                 >
 
-                    <div className="flex flex-1 items-center rounded-xl border border-gray-200 bg-gray-50 px-3">
-
-                        <input
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            placeholder="Ask the patient a question..."
-                            className="h-12 flex-1 bg-transparent px-2 text-sm outline-none"
-                        />
-
-                        <button
-                            type="button"
-                            className="rounded-lg p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-700"
-                        >
-                            <Mic size={19} />
-                        </button>
-
-                    </div>
+                    <input
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        placeholder="Ask the patient anything..."
+                        aria-label="Message to the patient"
+                        className="h-[46px] flex-1 bg-transparent text-[14.5px] outline-none"
+                    />
 
                     <button
                         type="submit"
                         disabled={!message.trim() || isSending}
-                        className="flex h-12 w-12 items-center justify-center rounded-xl bg-light-blue text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label="Send"
+                        className="grid h-[46px] w-[46px] shrink-0 cursor-pointer place-items-center rounded-full bg-grad text-on-hero transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        <Send size={18} />
+                        <ArrowUp size={19} />
                     </button>
 
                 </form>
 
-                <p className="mt-2 text-center text-xs text-gray-400">
+                <p className="mt-2 text-center text-xs text-ink-3">
                     Ask questions naturally as you would during a real consultation.
                 </p>
 

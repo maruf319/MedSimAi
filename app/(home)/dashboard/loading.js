@@ -3,7 +3,7 @@ import { Bone, SkeletonPage, SkeletonSection, SkeletonText } from '@/app/compone
 export default function Loading() {
     return (
         <SkeletonPage label='Loading your dashboard'>
-            <div className='overflow-hidden rounded-3xl border border-brand-secondary bg-white'>
+            <div className='overflow-hidden rounded-3xl card'>
                 <div className='grid items-center gap-6 px-6 pt-8 sm:px-10 sm:pt-10 lg:grid-cols-[1.15fr_1fr]'>
                     <div className='flex flex-col gap-4 pb-4 lg:pb-24'>
                         <Bone className='h-3 w-40' />
@@ -17,7 +17,7 @@ export default function Loading() {
                     </div>
                     <Bone className='mx-auto h-72 w-full max-w-md rounded-[45%] sm:h-80 lg:h-[26rem]' />
                 </div>
-                <div className='relative mx-4 -mt-6 mb-4 grid grid-cols-3 rounded-2xl bg-white shadow-[0_20px_50px_-20px_rgb(39_71_96_/_0.25)] ring-1 ring-brand-secondary sm:mx-10 sm:mb-8 lg:-mt-20'>
+                <div className='relative mx-4 -mt-6 mb-4 grid grid-cols-3 card sm:mx-10 sm:mb-8 lg:-mt-20'>
                     {[0, 1, 2].map((i) =>
                         <div key={i} className='flex flex-col items-center gap-2 px-2 py-6'>
                             <Bone className='h-8 w-14' />

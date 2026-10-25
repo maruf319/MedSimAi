@@ -1,87 +1,56 @@
 'use client'
-import { LogOut } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
 import React from 'react'
-import { adminLogout, logout } from '../actions/auth'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { getMenu, isActive } from './navigation'
+import NavIcon from './NavIcon'
+import Logo from './Logo'
+import AccountMenu from './AccountMenu'
+import ThemeToggle from './ThemeToggle'
 
-export function NavContent({ name, email, variant = 'student', isAdmin = false, onNavigate }) {
+/** Floating panel on the left (desktop). Slims to an icon rail between 1024 and 1280px. */
+export default function Sidebar(props) {
+    const { variant = 'student', isAdmin = false } = props
     const pathname = usePathname()
     const menu = getMenu(variant, isAdmin)
-    const roleLabel = variant === 'admin' || isAdmin ? 'Admin' : 'Student'
 
     return (
-        <div className='flex h-full flex-col'>
-            <nav className='flex flex-col gap-1 px-3' aria-label='Main'>
-                <div className='px-3 pb-2 text-xs font-medium uppercase tracking-wide text-white/50'>
-                    {variant === 'admin' ? 'Admin' : 'Platform'}
+        <aside className='hidden shrink-0 py-3.5 pl-3.5 lg:block'>
+            <div className='frost flex h-full w-[76px] flex-col gap-[22px] rounded-[28px] px-2.5 pb-3 pt-5 xl:w-[244px] xl:px-3 xl:pt-[22px]'>
+                <div className='flex justify-center xl:justify-start xl:px-2.5'>
+                    <Logo href={variant === 'admin' ? '/admin-dashboard' : '/dashboard'} tag={variant === 'admin' ? 'Admin' : null} compactAtLg />
                 </div>
-                {menu.map((m) => {
-                    const active = isActive(pathname, m)
-                    const Icon = m.icon
-                    return (
-                        <Link
-                            key={m.link}
-                            href={m.link}
-                            onClick={onNavigate}
-                            aria-current={active ? 'page' : undefined}
-                            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${active ? 'bg-white text-light-blue shadow-sm' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
-                        >
-                            <Icon className='h-5 w-5 shrink-0' />
-                            <span>{m.title}</span>
-                        </Link>
-                    )
-                })}
-            </nav>
 
-            <div className='mt-auto border-t border-white/10 p-4'>
-                <div className='flex items-center gap-3'>
-                    <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-light-blue font-semibold text-white'>
-                        {name?.charAt(0)?.toUpperCase() ?? '?'}
-                    </div>
-                    <div className='min-w-0'>
-                        <div className='truncate text-sm text-white'>{name ?? 'No user'}</div>
-                        <div className='truncate text-xs text-white/50'>{email ?? roleLabel}</div>
-                    </div>
+                <nav className='flex flex-col gap-1' aria-label='Main'>
+                    {menu.map((item) => {
+                        const active = isActive(pathname, item)
+                        return (
+                            <Link
+                                key={item.link}
+                                href={item.link}
+                                title={item.title}
+                                aria-current={active ? 'page' : undefined}
+                                className={`flex h-[46px] items-center justify-center gap-3 rounded-full px-0 text-[14.5px] font-medium transition xl:justify-start xl:px-3.5 ${active
+                                    ? 'bg-grad text-on-hero'
+                                    : 'text-ink-2 hover:bg-surface-2 hover:text-ink'}`}
+                            >
+                                <NavIcon name={item.icon} active={active} />
+                                <span className='hidden xl:inline'>{item.title}</span>
+                            </Link>
+                        )
+                    })}
+                </nav>
+
+                <div className='mt-auto flex flex-col items-center gap-2 xl:flex-row'>
+                    <span className='hidden w-full xl:flex xl:min-w-0 xl:flex-1'>
+                        <AccountMenu {...props} placement='side' />
+                    </span>
+                    <span className='xl:hidden'>
+                        <AccountMenu {...props} placement='side' compact />
+                    </span>
+                    <ThemeToggle className='h-[54px] w-[54px]' />
                 </div>
-                <form action={variant === 'admin' ? adminLogout : logout} className='mt-3'>
-                    <button
-                        type="submit"
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white cursor-pointer"
-                    >
-                        <LogOut className='h-4 w-4' />
-                        Sign out
-                    </button>
-                </form>
             </div>
-        </div>
-    )
-}
-
-export function Logo({ href }) {
-    return (
-        <Link href={href} className='inline-flex'>
-            <Image
-                width={182}
-                height={32}
-                alt='MedSimAI'
-                src={'/logo/medsimailogo.png'}
-                className='h-8 w-[182px] brightness-0 invert'
-                priority
-            />
-        </Link>
-    )
-}
-
-export default function Sidebar(props) {
-    return (
-        <aside className='nav-gradient hidden w-64 shrink-0 flex-col lg:flex'>
-            <div className='px-6 py-6'>
-                <Logo href={props.variant === 'admin' ? '/admin-dashboard' : '/dashboard'} />
-            </div>
-            <NavContent {...props} />
         </aside>
     )
 }

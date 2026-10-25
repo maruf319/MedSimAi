@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { saveNotes } from '@/app/actions/casePrep'
+import { btn, inputClass } from '@/app/components/ui'
 
 export default function Note({ attemptId, initialNotes = '' }) {
     const [notes, setNotes] = useState(initialNotes)
@@ -32,30 +33,31 @@ export default function Note({ attemptId, initialNotes = '' }) {
     }
 
     return (
-        <div className='flex h-full flex-col gap-2 p-4 text-Secondary-Text'>
+        <div className='flex h-full flex-col gap-3 px-4 pb-4'>
             <textarea
                 value={notes}
                 onChange={(e) => { setNotes(e.target.value); setStatus('') }}
                 maxLength={10000}
-                className='flex-1 rounded-lg border border-gray-200 p-2 outline-none min-h-50'
+                className={`${inputClass} min-h-50 flex-1 py-3 font-mono text-[13px] leading-[1.7]`}
+                aria-label='Notes'
                 placeholder='Take a note...'
             />
             <div className='flex items-center justify-between gap-2'>
-                <span className={`text-sm ${status === 'Saved' ? 'text-green-600' : 'text-red-600'}`}>
-                    {status || (hasChanges ? <span className='text-Secondary-Text'>Unsaved changes</span> : '')}
+                <span className={`text-[12.5px] ${status === 'Saved' ? 'text-good' : status ? 'text-bad' : 'text-ink-3'}`}>
+                    {status || (hasChanges ? 'Unsaved changes' : '')}
                 </span>
                 <div className='flex gap-2'>
                     <button
                         onClick={handleDiscard}
                         disabled={!hasChanges || isSaving}
-                        className='rounded-full border border-brand-secondary px-4 py-2 text-sm text-deep-blue hover:bg-brand-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50'
+                        className={btn('ghost', 'sm')}
                     >
                         Discard
                     </button>
                     <button
                         onClick={handleSave}
                         disabled={!hasChanges || isSaving}
-                        className='rounded-full bg-light-blue px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark cursor-pointer disabled:cursor-not-allowed disabled:opacity-50'
+                        className={btn('primary', 'sm')}
                     >
                         {isSaving ? 'Saving...' : 'Save'}
                     </button>
